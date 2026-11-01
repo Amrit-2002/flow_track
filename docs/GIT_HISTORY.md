@@ -39,3 +39,7 @@ This log tracks every Git commit made throughout the incremental development of 
 ### Commit 9: `feat(projects): implement project management APIs and membership controls`
 - **Scope**: Backend Project Management, Authorization, and Membership Lifecycle.
 - **Details**: Implemented complete REST endpoints for projects (`GET /api/v1/projects`, `POST /api/v1/projects`, `GET /api/v1/projects/:id`, `PATCH /api/v1/projects/:id`, `DELETE /api/v1/projects/:id`, `POST /api/v1/projects/:id/members`, `DELETE /api/v1/projects/:id/members/:userId`). Enforces strict role-based creation rules (`ADMIN` or `MANAGER`), auto-assigns creator as project `ADMIN`, restricts project updates/deletions and member invitations/removals to project `ADMIN`s, prevents removing the last project admin, cascades member deletions, and verifies tenant isolation through 7 Vitest integration tests.
+
+### Commit 10: `feat(dashboard): add aggregated statistics API for project and issue analytics`
+- **Scope**: Backend Dashboard & Project Aggregated Metrics.
+- **Details**: Built high-performance aggregated statistics service and endpoint (`GET /api/v1/dashboard/stats`). Supports global system scope for admins/managers and member-scoped project visibility for regular users. Computes issue counts by status, type distribution, top assignee workload, total and average logged time, algorithmic bottleneck status detection, top contributor activity, and recent audit activity timeline. Verified through 5 Vitest integration tests.

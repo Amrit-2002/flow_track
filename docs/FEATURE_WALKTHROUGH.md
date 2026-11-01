@@ -98,3 +98,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Deadlock & Orphan Prevention**: An admin cannot remove the last project `ADMIN` from a project, ensuring projects never become unmanageable orphans.
   - **Search & Pagination**: Project listing supports case-insensitive name/key filtering and cursor/offset pagination.
 - **Verification**: 7 comprehensive Vitest integration tests in `apps/api/src/modules/projects/project.test.ts` testing project creation, listing, unauthorized viewing rejection (403), duplicate member rejection (409), and removing last admin prevention (400). Total 19 backend tests passing. TypeScript typecheck passed cleanly.
+
+---
+
+## Milestone 4.2: Backend Dashboard Analytics & Aggregated Metrics API
+- **Status**: Completed
+- **Summary**: Implemented the aggregated statistics service and REST endpoint (`GET /api/v1/dashboard/stats`) calculating real-time operational metrics across projects or scoped to individual projects.
+- **Key Implementation Decisions**:
+  - **Dynamic Tenant & Project Scoping**: If `?projectId=` is provided, checks user project membership (or global `ADMIN` status) before returning project metrics; if omitted, `ADMIN` and `MANAGER` receive organization-wide statistics, while standard `USER` accounts receive aggregated metrics strictly for projects they are assigned to.
+  - **Prisma Aggregations & GroupBy**: Utilized Prisma `groupBy` queries for `statusId`, `type`, and `assigneeId`, alongside `prisma.timeLog.aggregate({ _sum: { timeSpent: true } })` to compute totals and averages with minimal database queries.
+  - **Bottleneck Detection**: Identifies the workflow status harboring the highest density of unresolved work by excluding terminal statuses ('Done', 'Closed', 'Completed') and sorting backlog density.
+  - **Recent Activity Audit Feed**: Returns the top 10 recent issue audit actions with actor details.
+- **Verification**: 5 Vitest integration tests in `apps/api/src/modules/dashboard/dashboard.test.ts` testing auth guard (401), non-existent project (404), unauthorized member access (403), admin organization-wide calculations, and authorized project scoping. Total 24 backend tests passing. TypeScript typecheck passed cleanly.

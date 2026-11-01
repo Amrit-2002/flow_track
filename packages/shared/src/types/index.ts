@@ -185,6 +185,7 @@ export interface DashboardStatsDTO {
     userName: string;
     timeLogsCount: number;
   } | null;
+  recentActivities?: ActivityDTO[];
 }
 
 export interface NotificationDTO {
