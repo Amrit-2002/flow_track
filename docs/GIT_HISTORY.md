@@ -15,3 +15,7 @@ This log tracks every Git commit made throughout the incremental development of 
 ### Commit 3: `chore: initialize TypeScript monorepo with web, api, and shared workspaces`
 - **Scope**: Monorepo foundation and npm workspaces.
 - **Details**: Created root `package.json` with npm workspaces (`apps/*`, `packages/*`), root `tsconfig.base.json`, `.editorconfig`, `docker-compose.yml` for PostgreSQL 16, `.env.example`, and initialized `@flowtrack/shared` containing all domain constants, DTO types, and Zod validation schemas.
+
+### Commit 4: `feat(db): configure Prisma schema, migrations, and database seeder`
+- **Scope**: Database modeling and Prisma ORM configuration.
+- **Details**: Configured `apps/api/prisma/schema.prisma` with 14 models (`User`, `Project`, `ProjectMember`, `Status`, `WorkflowTransition`, `Issue`, `Comment`, `Attachment`, `TimeLog`, `Activity`, `Notification`, `SavedFilter`, `RefreshToken`, `Client`, `Task`), created the database seeder (`seed.ts`), initialized the singleton `prisma.ts` client instance, and successfully generated Prisma Client v5.22.

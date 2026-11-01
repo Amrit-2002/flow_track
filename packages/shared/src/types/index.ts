@@ -230,3 +230,4 @@ export interface TaskDTO {
   createdAt: string;
   updatedAt: string;
 }
+

@@ -30,3 +30,14 @@ This document records the incremental implementation walkthrough for every compl
   - **Docker Compose**: Prepared local PostgreSQL 16 container service with persistent volume and health check.
   - **Type Safety**: Defined all DTOs and API standard envelope interfaces (`ApiResponse<T>`, `PaginatedResponse<T>`).
 - **Verification**: `@flowtrack/shared` compiled to `dist/` with zero TypeScript errors.
+
+---
+
+## Milestone 2.2: Prisma Schema & Database Seeder
+- **Status**: Completed
+- **Summary**: Created the full relational PostgreSQL schema in Prisma, configured connection pooling and direct migration URLs, implemented the comprehensive database seeder, and set up the singleton Prisma client instance.
+- **Key Implementation Decisions**:
+  - **Composite Keys & Referential Integrity**: Enforced `@unique([projectId, userId])` on `ProjectMember` and `@unique([fromStatusId, toStatusId])` on `WorkflowTransition`.
+  - **Hierarchy Modeling**: Self-referencing `parentId` on `Issue` models the subtask relationship with `onDelete: SetNull`.
+  - **Database Seeder**: Seeds 3 users (Admin, Manager, User), 3 Statuses (To Do, In Progress, Done), 4 Workflow Transitions, 3 Projects (ECOM, CRM, MOBI) with team roles, sample issues with subtasks, comments, time logs, and legacy tasks.
+- **Verification**: `npx prisma generate` completed with v5.22.0 client; `npm run typecheck --workspace=@flowtrack/api` passed with zero errors.
