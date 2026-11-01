@@ -74,3 +74,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Dual-Token Lifetime**: 15-minute JWT access token in memory for rapid verification; 7-day SHA-256 hashed refresh token in HTTP-only, secure, SameSite cookie.
   - **Parity with Laravel ProfileController**: Account deactivation explicitly deletes associated tasks and clients before setting `deletedAt`, maintaining referential integrity.
 - **Verification**: 12 Vitest tests passing in `apps/api` (`auth.test.ts` and `app.test.ts`); TypeScript typecheck passed with zero errors.
+
+---
+
+## Milestone 3.2: Frontend Authentication, State Management & Route Guards
+- **Status**: Completed
+- **Summary**: Connected the React frontend to the backend authentication and user profile APIs.
+- **Key Implementation Decisions**:
+  - **Transparent Token Refresh Queue**: Implemented in Axios interceptors (`services/api.ts`). When an access token expires (401), pending requests are queued while `/auth/refresh` rotates the token using the HTTP-only cookie, seamlessly retrying the failed requests without interrupting the user.
+  - **Route Protection**: `ProtectedRoute` checks authentication and role permissions before rendering workspace layouts, displaying a non-intrusive loading state during silent cookie verification.
+  - **Interview & Showcase Friendly**: `LoginPage` includes one-click quick-fill buttons for demo credentials (Admin, Manager, User).
+  - **Profile Management**: Built `ProfilePage` for updating personal details, changing password with current password verification, and switching light/dark theme with instant DOM and database synchronization.
+- **Verification**: 4 Vitest component tests passing in `apps/web` (`LoginPage.test.tsx` and `DashboardLayout.test.tsx`); Vite production build succeeded in 9.39s; TypeScript typecheck passed cleanly.

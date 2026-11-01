@@ -24,3 +24,4 @@ authRouter.post('/register', authLimiter, (req, res, next) => authController.reg
 authRouter.post('/login', authLimiter, (req, res, next) => authController.login(req, res, next));
 authRouter.post('/refresh', (req, res, next) => authController.refresh(req, res, next));
 authRouter.post('/logout', (req, res, next) => authController.logout(req, res, next));
+

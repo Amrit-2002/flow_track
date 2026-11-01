@@ -12,3 +12,4 @@ userRouter.patch('/me/password', (req, res, next) => userController.changePasswo
 userRouter.patch('/me/theme', (req, res, next) => userController.updateTheme(req, res, next));
 userRouter.delete('/me', (req, res, next) => userController.deleteAccount(req, res, next));
 userRouter.get('/', (req, res, next) => userController.listUsers(req, res, next));
+

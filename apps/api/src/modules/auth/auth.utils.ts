@@ -34,3 +34,4 @@ export function calculateRefreshTokenExpiry(): Date {
   now.setDate(now.getDate() + 7);
   return now;
 }
+
