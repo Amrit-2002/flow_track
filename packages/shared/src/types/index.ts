@@ -39,6 +39,8 @@ export interface ProjectDTO {
   isArchived: boolean;
   createdAt: string;
   updatedAt: string;
+  members?: ProjectMemberDTO[];
+  issues?: IssueDTO[];
   _count?: {
     issues: number;
     members: number;

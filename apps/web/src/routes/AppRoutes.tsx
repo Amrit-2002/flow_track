@@ -5,6 +5,7 @@ import { AuthLayout } from '../layouts/AuthLayout';
 import { ProtectedRoute } from './ProtectedRoute';
 import { DashboardPage } from '../pages/DashboardPage';
 import { ProjectsPage } from '../pages/ProjectsPage';
+import { ProjectDetailPage } from '../pages/ProjectDetailPage';
 import { IssuesPage } from '../pages/IssuesPage';
 import { KanbanBoardPage } from '../pages/KanbanBoardPage';
 import { TasksPage } from '../pages/TasksPage';
@@ -57,6 +58,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/:id" element={<ProjectDetailPage />} />
           <Route path="/issues" element={<IssuesPage />} />
           <Route path="/kanban" element={<KanbanBoardPage />} />
           <Route path="/tasks" element={<TasksPage />} />

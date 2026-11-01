@@ -43,3 +43,7 @@ This log tracks every Git commit made throughout the incremental development of 
 ### Commit 10: `feat(dashboard): add aggregated statistics API for project and issue analytics`
 - **Scope**: Backend Dashboard & Project Aggregated Metrics.
 - **Details**: Built high-performance aggregated statistics service and endpoint (`GET /api/v1/dashboard/stats`). Supports global system scope for admins/managers and member-scoped project visibility for regular users. Computes issue counts by status, type distribution, top assignee workload, total and average logged time, algorithmic bottleneck status detection, top contributor activity, and recent audit activity timeline. Verified through 5 Vitest integration tests.
+
+### Commit 11: `feat(projects): build project management UI and member management flows`
+- **Scope**: Frontend Project Management, Member Directory, and Modal Workflows.
+- **Details**: Implemented `projectService` connecting to backend project REST endpoints. Built `ProjectsPage` with TanStack Query caching, keyword search, active/archived workspace toggling, and paginated responsive project cards. Developed `CreateProjectModal` with auto-key generation and Zod validation, `ProjectDetailPage` (`/projects/:id`) with tabbed navigation for team membership and issue backlogs, `AddMemberModal` with role selection (`ADMIN` vs `MEMBER`), and `EditProjectModal` with archive controls. Verified through Vitest component tests and successful Vite production build.

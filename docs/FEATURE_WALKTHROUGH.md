@@ -110,3 +110,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Bottleneck Detection**: Identifies the workflow status harboring the highest density of unresolved work by excluding terminal statuses ('Done', 'Closed', 'Completed') and sorting backlog density.
   - **Recent Activity Audit Feed**: Returns the top 10 recent issue audit actions with actor details.
 - **Verification**: 5 Vitest integration tests in `apps/api/src/modules/dashboard/dashboard.test.ts` testing auth guard (401), non-existent project (404), unauthorized member access (403), admin organization-wide calculations, and authorized project scoping. Total 24 backend tests passing. TypeScript typecheck passed cleanly.
+
+---
+
+## Milestone 4.3: Frontend Project Management UI & Team Administration
+- **Status**: Completed
+- **Summary**: Delivered end-to-end frontend interfaces for browsing, creating, inspecting, and managing projects and project member assignments.
+- **Key Implementation Decisions**:
+  - **Service Architecture**: `project.service.ts` encapsulates all REST calls with proper TypeScript generic typings (`PaginatedResponse<ProjectDTO>`, `ApiResponse<ProjectMemberDTO>`).
+  - **Interactive Creation**: `CreateProjectModal` features auto-generating project keys (e.g. "Customer Portal" -> "CP") that are enforced uppercase and validated with `createProjectSchema`.
+  - **Project Detail Navigation**: Built dedicated route `/projects/:id` in `AppRoutes.tsx` with breadcrumbs, role-based action buttons (Settings and Delete hidden from non-admin members), and tabs separating Team Members from the Issues Backlog.
+  - **Member Administration**: `AddMemberModal` enables inviting users with assigned role (`ADMIN` or `MEMBER`), and project admins can remove members with confirmation safeguards.
+- **Verification**: 2 new Vitest component tests in `ProjectsPage.test.tsx` verifying project cards rendering, key badges, member counts, and empty states. 6 total web tests passing. TypeScript typecheck passed with 0 errors; Vite production build completed in 12.58s.
