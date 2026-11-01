@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: flowtrack_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: flowtrack
+      POSTGRES_PASSWORD: flowtrack_secret_password
+      POSTGRES_DB: flowtrack
+    ports:
+      - "5432:5432"
+    volumes:
+      - flowtrack_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flowtrack -d flowtrack"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  flowtrack_pgdata:
+    driver: local

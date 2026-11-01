@@ -1,0 +1,38 @@
+{
+  "name": "flowtrack",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FlowTrack — Project & Issue Management Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:api": "npm run dev --workspace=@flowtrack/api",
+    "dev:web": "npm run dev --workspace=@flowtrack/web",
+    "build": "npm run build --workspace=@flowtrack/shared && npm run build --workspace=@flowtrack/api && npm run build --workspace=@flowtrack/web",
+    "build:shared": "npm run build --workspace=@flowtrack/shared",
+    "build:api": "npm run build --workspace=@flowtrack/api",
+    "build:web": "npm run build --workspace=@flowtrack/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:generate": "npm run db:generate --workspace=@flowtrack/api",
+    "db:migrate": "npm run db:migrate --workspace=@flowtrack/api",
+    "db:seed": "npm run db:seed --workspace=@flowtrack/api",
+    "db:studio": "npm run db:studio --workspace=@flowtrack/api"
+  },
+  "keywords": [
+    "project-management",
+    "issue-tracker",
+    "kanban",
+    "workflow",
+    "react",
+    "express",
+    "postgresql",
+    "prisma"
+  ],
+  "author": "Amrit Maurya",
+  "license": "MIT"
+}
