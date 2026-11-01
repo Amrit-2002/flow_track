@@ -50,3 +50,4 @@ export class UnprocessableEntityError extends AppError {
     super(message, 422, errorCode, details);
   }
 }
+

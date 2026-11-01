@@ -52,3 +52,14 @@ This document records the incremental implementation walkthrough for every compl
   - **Robust Error Envelope**: Centralized error middleware captures `AppError`, `ZodError` (maps field paths to messages), and Prisma client errors (`P2002` duplicate key, `P2025` missing record), ensuring consistent JSON error shapes across all endpoints.
   - **Graceful Shutdown**: Catches `SIGTERM` and `SIGINT`, closes HTTP connections, safely disconnects Prisma, and forces exit after 10s timeout.
 - **Verification**: All 3 Vitest integration tests passed (`app.test.ts`); TypeScript typecheck passed cleanly.
+
+---
+
+## Milestone 2.4: React SPA Skeleton & Dashboard Layout
+- **Status**: Completed
+- **Summary**: Created the React 18 single page application with Vite, Tailwind CSS, Redux Toolkit, and TanStack Query. Built the responsive `DashboardLayout` with light/dark theme toggle, navigation links, and placeholder views.
+- **Key Implementation Decisions**:
+  - **Theme Persistence**: `themeSlice` syncs with `localStorage` and toggles `.dark` on `document.documentElement` immediately to eliminate visual flash.
+  - **Client vs Server State Separation**: Redux Toolkit manages UI theme and auth token; TanStack Query manages server caching.
+  - **Testing Reliability**: Added `window.matchMedia` mock in JSDOM setup for reliable component testing.
+- **Verification**: Vitest component test passed (`DashboardLayout.test.tsx`); `npm run typecheck` passed with 0 errors; Vite production build completed in 9.77s.

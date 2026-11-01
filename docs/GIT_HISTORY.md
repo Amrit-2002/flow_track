@@ -23,3 +23,7 @@ This log tracks every Git commit made throughout the incremental development of 
 ### Commit 5: `feat(api): set up Express application skeleton with health check and error middleware`
 - **Scope**: Backend API infrastructure.
 - **Details**: Built the Express.js application skeleton with Zod environment validation (`config/env.ts`), structured Pino logging, custom `AppError` hierarchy, centralized error handler with Zod and Prisma error formatting, 404 route handler, `/health` and `/api/v1` base endpoints, Socket.IO server initialization with project/user rooms, graceful shutdown handling, and Vitest integration tests.
+
+### Commit 6: `feat(web): configure Vite, React, Tailwind CSS, and base routing layout`
+- **Scope**: Frontend SPA setup and design system layout.
+- **Details**: Initialized `@flowtrack/web` with Vite, React 18, Tailwind CSS, Redux Toolkit, and TanStack Query. Built `DashboardLayout` with responsive collapsible sidebar and light/dark theme toggle, `AuthLayout`, core routing (`/dashboard`, `/projects`, `/issues`, `/kanban`, `/tasks`, `/clients`, `/login`, `/register`), JSDOM test setup with `window.matchMedia` mock, and verified with passing Vitest component tests and production build.
