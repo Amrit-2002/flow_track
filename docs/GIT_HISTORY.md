@@ -27,3 +27,7 @@ This log tracks every Git commit made throughout the incremental development of 
 ### Commit 6: `feat(web): configure Vite, React, Tailwind CSS, and base routing layout`
 - **Scope**: Frontend SPA setup and design system layout.
 - **Details**: Initialized `@flowtrack/web` with Vite, React 18, Tailwind CSS, Redux Toolkit, and TanStack Query. Built `DashboardLayout` with responsive collapsible sidebar and light/dark theme toggle, `AuthLayout`, core routing (`/dashboard`, `/projects`, `/issues`, `/kanban`, `/tasks`, `/clients`, `/login`, `/register`), JSDOM test setup with `window.matchMedia` mock, and verified with passing Vitest component tests and production build.
+
+### Commit 7: `feat(auth): implement backend JWT authentication, refresh token rotation, and RBAC`
+- **Scope**: Backend Authentication, Token Rotation, and User Management.
+- **Details**: Implemented dual-token JWT authentication with short-lived (15m) access tokens and durable (7d) refresh token cookies with rotation and replay attack detection. Built `modules/auth/` (register, login, refresh, logout), `modules/users/` (profile update, password change with old password verification, theme preference toggle, account deactivation cascading to tasks/clients), `requireAuth` and `requireRole` middleware, rate-limiting on auth endpoints, and comprehensive Vitest integration tests covering all positive and negative security flows.

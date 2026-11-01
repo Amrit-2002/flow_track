@@ -24,12 +24,13 @@ export function errorHandler(
     return;
   }
 
-  // 2. Zod validation errors
-  if (err instanceof ZodError) {
-    const formattedErrors = err.errors.map((e) => ({
+  // 2. Zod validation errors (checking both instanceof and err.name for monorepo safety)
+  if (err instanceof ZodError || err.name === 'ZodError') {
+    const zodErr = err as ZodError;
+    const formattedErrors = zodErr.errors?.map((e) => ({
       field: e.path.join('.'),
       message: e.message,
-    }));
+    })) || [];
 
     res.status(400).json({
       success: false,
@@ -95,4 +96,3 @@ export function errorHandler(
     },
   });
 }
-

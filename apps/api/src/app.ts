@@ -7,6 +7,8 @@ import { env } from './config/env';
 import { logger } from './shared/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
+import { authRouter } from './modules/auth/auth.routes';
+import { userRouter } from './modules/users/user.routes';
 
 export function createApp(): Express {
   const app = express();
@@ -37,7 +39,7 @@ export function createApp(): Express {
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use(cookieParser());
 
-  // Structured HTTP logging (skip during testing to keep test output clean)
+  // Structured HTTP logging
   if (env.NODE_ENV !== 'test') {
     app.use(
       pinoHttp({
@@ -69,6 +71,10 @@ export function createApp(): Express {
     });
   });
 
+  // Domain API Routes
+  app.use('/api/v1/auth', authRouter);
+  app.use('/api/v1/users', userRouter);
+
   // 404 handler for undefined routes
   app.use(notFoundHandler);
 
@@ -80,4 +86,3 @@ export function createApp(): Express {
 
 export const app = createApp();
 export default app;
-
