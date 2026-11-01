@@ -86,3 +86,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Interview & Showcase Friendly**: `LoginPage` includes one-click quick-fill buttons for demo credentials (Admin, Manager, User).
   - **Profile Management**: Built `ProfilePage` for updating personal details, changing password with current password verification, and switching light/dark theme with instant DOM and database synchronization.
 - **Verification**: 4 Vitest component tests passing in `apps/web` (`LoginPage.test.tsx` and `DashboardLayout.test.tsx`); Vite production build succeeded in 9.39s; TypeScript typecheck passed cleanly.
+
+---
+
+## Milestone 4.1: Backend Project Management & Membership Access Controls
+- **Status**: Completed
+- **Summary**: Built complete project lifecycle APIs, project membership management, and granular permission enforcement preserving Laravel's original authorization policies.
+- **Key Implementation Decisions**:
+  - **Granular Project Authorization**: Only global `ADMIN` or `MANAGER` can create projects. When created, the creator is automatically added as a `ProjectMember` with `ADMIN` role.
+  - **Resource Security**: Project modification, deletion, and member additions/removals are strictly guarded: only project `ADMIN`s (or global system `ADMIN`s) can perform administrative operations. Project viewing (`GET /projects/:id`) is strictly restricted to project members or global admins.
+  - **Deadlock & Orphan Prevention**: An admin cannot remove the last project `ADMIN` from a project, ensuring projects never become unmanageable orphans.
+  - **Search & Pagination**: Project listing supports case-insensitive name/key filtering and cursor/offset pagination.
+- **Verification**: 7 comprehensive Vitest integration tests in `apps/api/src/modules/projects/project.test.ts` testing project creation, listing, unauthorized viewing rejection (403), duplicate member rejection (409), and removing last admin prevention (400). Total 19 backend tests passing. TypeScript typecheck passed cleanly.

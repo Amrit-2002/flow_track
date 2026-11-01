@@ -9,6 +9,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 import { authRouter } from './modules/auth/auth.routes';
 import { userRouter } from './modules/users/user.routes';
+import { projectRouter } from './modules/projects/project.routes';
 
 export function createApp(): Express {
   const app = express();
@@ -74,6 +75,7 @@ export function createApp(): Express {
   // Domain API Routes
   app.use('/api/v1/auth', authRouter);
   app.use('/api/v1/users', userRouter);
+  app.use('/api/v1/projects', projectRouter);
 
   // 404 handler for undefined routes
   app.use(notFoundHandler);

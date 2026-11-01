@@ -1,4 +1,4 @@
-import { UserRole, ProjectMemberRole, IssueType, IssuePriority, ThemePreference } from '../constants';
+import { UserRole, ProjectMemberRole, IssueType, IssuePriority, ThemePreference } from '../constants/index.js';
 
 export interface ApiResponse<T = unknown> {
   success: boolean;

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserRole, ProjectMemberRole, IssueType, IssuePriority, ThemePreference, TaskDevStatus } from '../constants';
+import { UserRole, ProjectMemberRole, IssueType, IssuePriority, ThemePreference, TaskDevStatus } from '../constants/index.js';
 
 // ==========================================
 // Auth & User Schemas
