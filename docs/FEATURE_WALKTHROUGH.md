@@ -122,3 +122,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Project Detail Navigation**: Built dedicated route `/projects/:id` in `AppRoutes.tsx` with breadcrumbs, role-based action buttons (Settings and Delete hidden from non-admin members), and tabs separating Team Members from the Issues Backlog.
   - **Member Administration**: `AddMemberModal` enables inviting users with assigned role (`ADMIN` or `MEMBER`), and project admins can remove members with confirmation safeguards.
 - **Verification**: 2 new Vitest component tests in `ProjectsPage.test.tsx` verifying project cards rendering, key badges, member counts, and empty states. 6 total web tests passing. TypeScript typecheck passed with 0 errors; Vite production build completed in 12.58s.
+
+---
+
+## Milestone 4.4: Frontend Dashboard UI, Visual Charts & Workload Analytics
+- **Status**: Completed
+- **Summary**: Transformed placeholder dashboard into a rich, data-driven operational intelligence hub displaying velocity metrics, workflow status bars, issue type distributions, bottleneck warnings, and team workloads.
+- **Key Implementation Decisions**:
+  - **Dynamic Scope Filtering**: Integrated project selector dropdown allowing managers to view organization-wide metrics or isolate specific projects.
+  - **Recharts Data Visualization**: Implemented responsive BarChart mapping stage column density with customized color coding matching board states, alongside a centered DonutChart showing Bug/Feature/Task distribution.
+  - **Actionable Bottleneck Detection**: Automatically renders an amber attention banner when a non-terminal status holds disproportionate backlog volume, providing teams with direct visibility into throughput friction.
+  - **Audit Timeline & Workload Leaderboard**: Displays top assignees with percentage progress bars and real-time activity changes with actor names and timestamps.
+- **Verification**: Component test in `DashboardPage.test.tsx` verifying KPI metrics, bottleneck banner, project selector, and Recharts container rendering. Total 7 web tests and 24 API tests passing. TypeScript typecheck passed cleanly across all workspaces.
