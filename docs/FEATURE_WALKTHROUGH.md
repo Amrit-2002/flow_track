@@ -41,3 +41,14 @@ This document records the incremental implementation walkthrough for every compl
   - **Hierarchy Modeling**: Self-referencing `parentId` on `Issue` models the subtask relationship with `onDelete: SetNull`.
   - **Database Seeder**: Seeds 3 users (Admin, Manager, User), 3 Statuses (To Do, In Progress, Done), 4 Workflow Transitions, 3 Projects (ECOM, CRM, MOBI) with team roles, sample issues with subtasks, comments, time logs, and legacy tasks.
 - **Verification**: `npx prisma generate` completed with v5.22.0 client; `npm run typecheck --workspace=@flowtrack/api` passed with zero errors.
+
+---
+
+## Milestone 2.3: Express Server Skeleton & Core Middleware
+- **Status**: Completed
+- **Summary**: Created the Express API foundation, environment configuration validator with Zod, structured logging via Pino, centralized error handler, 404 handler, health checks, Socket.IO hub, and Vitest test suite.
+- **Key Implementation Decisions**:
+  - **Health Monitoring for Free Tier**: Dedicated `/health` endpoint configured to satisfy Render cold-start and readiness probes without database overhead.
+  - **Robust Error Envelope**: Centralized error middleware captures `AppError`, `ZodError` (maps field paths to messages), and Prisma client errors (`P2002` duplicate key, `P2025` missing record), ensuring consistent JSON error shapes across all endpoints.
+  - **Graceful Shutdown**: Catches `SIGTERM` and `SIGINT`, closes HTTP connections, safely disconnects Prisma, and forces exit after 10s timeout.
+- **Verification**: All 3 Vitest integration tests passed (`app.test.ts`); TypeScript typecheck passed cleanly.

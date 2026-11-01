@@ -19,3 +19,7 @@ This log tracks every Git commit made throughout the incremental development of 
 ### Commit 4: `feat(db): configure Prisma schema, migrations, and database seeder`
 - **Scope**: Database modeling and Prisma ORM configuration.
 - **Details**: Configured `apps/api/prisma/schema.prisma` with 14 models (`User`, `Project`, `ProjectMember`, `Status`, `WorkflowTransition`, `Issue`, `Comment`, `Attachment`, `TimeLog`, `Activity`, `Notification`, `SavedFilter`, `RefreshToken`, `Client`, `Task`), created the database seeder (`seed.ts`), initialized the singleton `prisma.ts` client instance, and successfully generated Prisma Client v5.22.
+
+### Commit 5: `feat(api): set up Express application skeleton with health check and error middleware`
+- **Scope**: Backend API infrastructure.
+- **Details**: Built the Express.js application skeleton with Zod environment validation (`config/env.ts`), structured Pino logging, custom `AppError` hierarchy, centralized error handler with Zod and Prisma error formatting, 404 route handler, `/health` and `/api/v1` base endpoints, Socket.IO server initialization with project/user rooms, graceful shutdown handling, and Vitest integration tests.
