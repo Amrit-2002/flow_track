@@ -19,6 +19,7 @@ interface CreateIssueModalProps {
   onSuccess: () => void;
   defaultProjectId?: string;
   defaultParentId?: string;
+  defaultStatusId?: string;
 }
 
 export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
@@ -27,6 +28,7 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
   onSuccess,
   defaultProjectId,
   defaultParentId,
+  defaultStatusId,
 }) => {
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -87,11 +89,13 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
   });
 
   useEffect(() => {
-    if (statuses.length > 0 && !watch('statusId')) {
+    if (defaultStatusId) {
+      setValue('statusId', defaultStatusId);
+    } else if (statuses.length > 0 && !watch('statusId')) {
       const todoStatus = statuses.find((s) => s.name.toLowerCase() === 'to do') || statuses[0];
       setValue('statusId', todoStatus.id);
     }
-  }, [statuses, setValue, watch]);
+  }, [statuses, defaultStatusId, setValue, watch]);
 
   useEffect(() => {
     if (defaultProjectId) {

@@ -12,3 +12,4 @@ router.patch('/:id', validateRequest(updateCommentSchema), commentController.upd
 router.delete('/:id', commentController.delete);
 
 export const commentRouter = router;
+

@@ -32,3 +32,4 @@ export const clientService = {
     await apiClient.delete(`/clients/${id}`);
   },
 };
+

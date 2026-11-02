@@ -55,6 +55,16 @@ export const issueService = {
     return response.data.data;
   },
 
+  async transitionIssue(id: string, statusId: string): Promise<IssueDTO> {
+    const response = await apiClient.patch<ApiResponse<IssueDTO>>(`/issues/${id}/status`, {
+      statusId,
+    });
+    if (!response.data.data) {
+      throw new Error('Failed to transition issue status');
+    }
+    return response.data.data;
+  },
+
   async deleteIssue(id: string): Promise<void> {
     await apiClient.delete(`/issues/${id}`);
   },

@@ -12,3 +12,4 @@ router.use(requireAuth);
 router.delete('/:id', attachmentController.delete);
 
 export const attachmentRouter = router;
+

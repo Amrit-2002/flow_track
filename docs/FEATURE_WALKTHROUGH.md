@@ -204,3 +204,15 @@ This document records the incremental implementation walkthrough for every compl
   - **In-App Notification Dispatch**: Adding a comment atomically generates in-app `Notification` records for issue assignees and reporters (excluding the comment author) alongside transactional `Activity` auditing (`COMMENT_ADDED`).
   - **Granular Ownership & Cascade Deletion**: Enforces strict author/admin permissions on comment edits and deletions, cleaning up physical storage files on disk when attachments or comments are removed.
 - **Verification**: 13 Vitest integration tests in `apps/api/src/modules/comments/comment.test.ts` verifying authentication (401), project authorization (403), notification triggers, author edit/delete guards, and attachment upload/download/deletion flows. 72 total API tests and 14 Web tests passing (86 total monorepo tests). Monorepo typechecks pass cleanly.
+
+---
+
+## Milestone 6.3: Interactive Kanban Board with Optimistic Status Updates
+- **Status**: Completed
+- **Summary**: Delivered dynamic drag-and-drop Kanban board supporting real-time workflow column rendering, optimistic UI state transitions, and automatic snapshot rollback on rejected transitions.
+- **Key Implementation Decisions**:
+  - **State-Driven Workflow Columns**: `KanbanBoardPage.tsx` dynamically queries `/workflows/statuses` to construct column lanes with color-coded status badges and item counters.
+  - **HTML5 Drag-and-Drop Experience**: Cards are draggable across columns with visual drop target highlighting, capturing dragged issues and executing instant transitions on release.
+  - **Optimistic State Updates & Rollback**: Uses TanStack Query `useMutation` with `onMutate` to immediately render the card in the destination column. If the backend state machine rejects the transition with HTTP 422, the query cache cleanly rolls back to the previous snapshot and displays a non-intrusive alert banner.
+  - **Accessible Quick-Transition Actions**: In addition to drag-and-drop, cards present permitted next-step buttons (e.g. "Move to In Progress →") queried from the workflow transition matrix.
+- **Verification**: 2 Vitest component tests in `KanbanBoardPage.test.tsx` verifying column rendering, card information, and quick transition click handlers. 16 web tests and 72 backend tests passing (88 total monorepo tests). Vite production build succeeded in 17.45s. Monorepo typechecks pass cleanly.

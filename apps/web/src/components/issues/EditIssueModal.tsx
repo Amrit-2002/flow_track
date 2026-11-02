@@ -248,3 +248,4 @@ export const EditIssueModal: React.FC<EditIssueModalProps> = ({
     </div>
   );
 };
+
