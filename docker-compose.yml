@@ -3,23 +3,51 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: flowtrack_postgres
-    restart: unless-stopped
+    container_name: flowtrack-db
     environment:
-      POSTGRES_USER: flowtrack
-      POSTGRES_PASSWORD: flowtrack_secret_password
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: flowtrack
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
-      - flowtrack_pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U flowtrack -d flowtrack"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d flowtrack']
       interval: 5s
       timeout: 5s
       retries: 5
 
-volumes:
-  flowtrack_pgdata:
-    driver: local
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: flowtrack-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/flowtrack?schema=public
+      JWT_ACCESS_SECRET: dev_super_secret_access_jwt_key_32chars_min
+      JWT_REFRESH_SECRET: dev_super_secret_refresh_jwt_key_32chars_min
+      CORS_ORIGIN: http://localhost:3000
+    ports:
+      - '5000:5000'
+    volumes:
+      - uploads_data:/app/uploads
 
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    container_name: flowtrack-web
+    depends_on:
+      - api
+    ports:
+      - '3000:80'
+
+volumes:
+  postgres_data:
+  uploads_data:
