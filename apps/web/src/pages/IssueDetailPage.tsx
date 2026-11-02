@@ -36,7 +36,9 @@ import { LogTimeModal } from '../components/time-logs/LogTimeModal';
 import { TimeLogSection } from '../components/time-logs/TimeLogSection';
 import { ActivityTimeline } from '../components/activities/ActivityTimeline';
 import { useAppSelector } from '../hooks/useRedux';
+import { useProjectSocket, useSocketEvent } from '../hooks/useSocket';
 import {
+  IssueDTO,
   CommentDTO,
   StatusDTO,
   WorkflowTransitionDTO,
@@ -114,6 +116,34 @@ export const IssueDetailPage: React.FC = () => {
     queryKey: ['issue-activities', id],
     queryFn: () => activityService.getIssueActivities(id!),
     enabled: Boolean(id),
+  });
+
+  // Real-time project room connection
+  useProjectSocket(issue?.projectId);
+
+  // Real-time status update broadcasts
+  useSocketEvent<{
+    issueId: string;
+    projectId: string;
+    fromStatusId: string;
+    toStatusId: string;
+    issue: IssueDTO;
+  }>('issue:status_changed', (payload) => {
+    if (payload?.issueId === id) {
+      queryClient.invalidateQueries({ queryKey: ['issue-detail', id] });
+      queryClient.invalidateQueries({ queryKey: ['issue-activities', id] });
+    }
+  });
+
+  // Real-time comment additions
+  useSocketEvent<{
+    issueId: string;
+    comment: CommentDTO;
+  }>('issue:comment_added', (payload) => {
+    if (payload?.issueId === id) {
+      queryClient.invalidateQueries({ queryKey: ['issue-comments', id] });
+      queryClient.invalidateQueries({ queryKey: ['issue-activities', id] });
+    }
   });
 
   // Status transition mutation

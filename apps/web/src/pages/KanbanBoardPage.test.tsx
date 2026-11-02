@@ -8,6 +8,7 @@ import { KanbanBoardPage } from './KanbanBoardPage';
 import { issueService } from '../services/issue.service';
 import { workflowService } from '../services/workflow.service';
 import { projectService } from '../services/project.service';
+import { socketService } from '../services/socket.service';
 import { IssuePriority, IssueType } from '@flowtrack/shared';
 
 describe('KanbanBoardPage Component', () => {
@@ -154,6 +155,123 @@ describe('KanbanBoardPage Component', () => {
 
     await waitFor(() => {
       expect(transitionSpy).toHaveBeenCalledWith('issue-1', 'stat-prog');
+    });
+  });
+
+  it('reacts to real-time issue:status_changed socket event and moves card to destination column', async () => {
+    const registeredHandlers: Record<string, (data: any) => void> = {};
+    vi.spyOn(socketService, 'on').mockImplementation((event: string, handler: any) => {
+      registeredHandlers[event] = handler;
+    });
+
+    render(
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <KanbanBoardPage />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Move to In Progress/i })).toBeInTheDocument();
+    });
+
+    // Simulate incoming real-time socket event from another user
+    await waitFor(() => {
+      expect(registeredHandlers['issue:status_changed']).toBeDefined();
+    });
+
+    registeredHandlers['issue:status_changed']({
+      issueId: 'issue-1',
+      projectId: 'proj-1',
+      fromStatusId: 'stat-todo',
+      toStatusId: 'stat-prog',
+      issue: {
+        ...mockIssues[0],
+        statusId: 'stat-prog',
+        status: mockStatuses[1],
+      },
+    });
+
+    // Button should now offer the next workflow transition: In Progress -> Done
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Move to Done/i })).toBeInTheDocument();
+    });
+  });
+
+  it('prepends newly created issue when issue:created socket event is broadcasted', async () => {
+    const registeredHandlers: Record<string, (data: any) => void> = {};
+    vi.spyOn(socketService, 'on').mockImplementation((event: string, handler: any) => {
+      registeredHandlers[event] = handler;
+    });
+
+    render(
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <KanbanBoardPage />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Setup Stripe Integration')).toBeInTheDocument();
+    });
+
+    registeredHandlers['issue:created']({
+      id: 'issue-live-99',
+      projectId: 'proj-1',
+      parentId: null,
+      title: 'Real-time Live Bug Ticket',
+      description: null,
+      type: IssueType.BUG,
+      priority: IssuePriority.HIGH,
+      statusId: 'stat-todo',
+      assigneeId: null,
+      reporterId: 'admin-1',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      project: { id: 'proj-1', key: 'COMM', name: 'Commerce' },
+      status: mockStatuses[0],
+      assignee: null,
+      reporter: { id: 'admin-1', name: 'Admin', email: 'admin@flowtrack.dev' },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Real-time Live Bug Ticket')).toBeInTheDocument();
+    });
+  });
+
+  it('removes issue card when issue:deleted socket event is broadcasted', async () => {
+    const registeredHandlers: Record<string, (data: any) => void> = {};
+    vi.spyOn(socketService, 'on').mockImplementation((event: string, handler: any) => {
+      registeredHandlers[event] = handler;
+    });
+
+    render(
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <KanbanBoardPage />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Setup Stripe Integration')).toBeInTheDocument();
+    });
+
+    registeredHandlers['issue:deleted']({
+      issueId: 'issue-1',
+      projectId: 'proj-1',
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText('Setup Stripe Integration')).not.toBeInTheDocument();
     });
   });
 });

@@ -17,6 +17,7 @@ import { issueService } from '../services/issue.service';
 import { projectService } from '../services/project.service';
 import { workflowService } from '../services/workflow.service';
 import { CreateIssueModal } from '../components/issues/CreateIssueModal';
+import { useProjectSocket, useSocketEvent } from '../hooks/useSocket';
 import {
   IssueDTO,
   StatusDTO,
@@ -88,7 +89,71 @@ export const KanbanBoardPage: React.FC = () => {
   });
   const issues = issuesData?.data || [];
 
-  // 5. Optimistic mutation for issue status transition
+  // 5. Real-time project collaboration
+  useProjectSocket(selectedProjectId);
+
+  // Real-time status update broadcasts from team members
+  useSocketEvent<{
+    issueId: string;
+    projectId: string;
+    fromStatusId: string;
+    toStatusId: string;
+    issue: IssueDTO;
+  }>('issue:status_changed', (payload) => {
+    if (!payload) return;
+    if (selectedProjectId && payload.projectId !== selectedProjectId) return;
+
+    queryClient.setQueryData(['kanban-issues', selectedProjectId], (old: any) => {
+      if (!old?.data) return old;
+      return {
+        ...old,
+        data: old.data.map((issue: IssueDTO) =>
+          issue.id === payload.issueId
+            ? {
+                ...issue,
+                statusId: payload.toStatusId,
+                status:
+                  payload.issue?.status ||
+                  statuses.find((s) => s.id === payload.toStatusId) ||
+                  issue.status,
+                updatedAt: payload.issue?.updatedAt || new Date().toISOString(),
+              }
+            : issue
+        ),
+      };
+    });
+  });
+
+  // Real-time issue creation broadcasts
+  useSocketEvent<IssueDTO>('issue:created', (newIssue) => {
+    if (!newIssue) return;
+    if (selectedProjectId && newIssue.projectId !== selectedProjectId) return;
+
+    queryClient.setQueryData(['kanban-issues', selectedProjectId], (old: any) => {
+      if (!old?.data) return old;
+      if (old.data.some((i: IssueDTO) => i.id === newIssue.id)) return old;
+      return {
+        ...old,
+        data: [newIssue, ...old.data],
+      };
+    });
+  });
+
+  // Real-time issue deletion broadcasts
+  useSocketEvent<{ issueId: string; projectId: string }>('issue:deleted', (payload) => {
+    if (!payload) return;
+    if (selectedProjectId && payload.projectId !== selectedProjectId) return;
+
+    queryClient.setQueryData(['kanban-issues', selectedProjectId], (old: any) => {
+      if (!old?.data) return old;
+      return {
+        ...old,
+        data: old.data.filter((i: IssueDTO) => i.id !== payload.issueId),
+      };
+    });
+  });
+
+  // 6. Optimistic mutation for issue status transition
   const transitionMutation = useMutation({
     mutationFn: ({ issueId, statusId }: { issueId: string; statusId: string }) =>
       issueService.transitionIssue(issueId, statusId),

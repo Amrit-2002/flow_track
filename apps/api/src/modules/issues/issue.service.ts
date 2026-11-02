@@ -1,5 +1,6 @@
 import { prisma } from '../../shared/prisma';
 import { workflowService } from '../workflows/workflow.service.js';
+import { emitToProject } from '../../sockets/index.js';
 import {
   CreateIssueInput,
   UpdateIssueInput,
@@ -407,7 +408,7 @@ export class IssueService {
       },
     });
 
-    return {
+    const result: IssueDTO = {
       id: newIssue.id,
       projectId: newIssue.projectId,
       parentId: newIssue.parentId,
@@ -425,6 +426,10 @@ export class IssueService {
       assignee: formatUser(newIssue.assignee),
       reporter: formatUser(newIssue.reporter)!,
     };
+
+    emitToProject(newIssue.projectId, 'issue:created', result);
+
+    return result;
   }
 
   /**
@@ -667,7 +672,7 @@ export class IssueService {
       }),
     ]);
 
-    return {
+    const result: IssueDTO = {
       id: updated.id,
       projectId: updated.projectId,
       parentId: updated.parentId,
@@ -685,6 +690,16 @@ export class IssueService {
       assignee: formatUser(updated.assignee),
       reporter: formatUser(updated.reporter)!,
     };
+
+    emitToProject(updated.projectId, 'issue:status_changed', {
+      issueId: updated.id,
+      projectId: updated.projectId,
+      fromStatusId: existing.statusId,
+      toStatusId: targetStatusId,
+      issue: result,
+    });
+
+    return result;
   }
 
   /**
@@ -711,6 +726,11 @@ export class IssueService {
     }
 
     await prisma.issue.delete({ where: { id } });
+
+    emitToProject(existing.projectId, 'issue:deleted', {
+      issueId: id,
+      projectId: existing.projectId,
+    });
   }
 }
 

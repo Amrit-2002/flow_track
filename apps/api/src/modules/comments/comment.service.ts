@@ -1,5 +1,6 @@
 import { prisma } from '../../shared/prisma.js';
 import { storageService } from '../attachments/storage.service.js';
+import { emitToProject, emitToUser } from '../../sockets/index.js';
 import {
   ForbiddenError,
   NotFoundError,
@@ -201,8 +202,9 @@ export class CommentService {
         notificationRecipients.add(issue.reporterId);
       }
 
+      const createdNotifications: any[] = [];
       for (const recipientId of notificationRecipients) {
-        await tx.notification.create({
+        const notif = await tx.notification.create({
           data: {
             userId: recipientId,
             type: 'ISSUE_COMMENTED',
@@ -215,15 +217,31 @@ export class CommentService {
             },
           },
         });
+        createdNotifications.push(notif);
       }
 
       return {
         ...comment,
         attachments: createdAttachments,
+        createdNotifications,
       };
     });
 
-    return {
+    // Real-time dispatch to notification recipients
+    for (const notif of newComment.createdNotifications || []) {
+      emitToUser(notif.userId, 'notification:new', {
+        id: notif.id,
+        userId: notif.userId,
+        type: notif.type,
+        title: notif.title,
+        message: notif.message,
+        data: notif.data,
+        readAt: notif.readAt ? (typeof notif.readAt === 'string' ? notif.readAt : notif.readAt.toISOString()) : null,
+        createdAt: notif.createdAt ? (typeof notif.createdAt === 'string' ? notif.createdAt : notif.createdAt.toISOString()) : new Date().toISOString(),
+      });
+    }
+
+    const result: CommentDTO = {
       id: newComment.id,
       issueId: newComment.issueId,
       userId: newComment.userId,
@@ -237,7 +255,7 @@ export class CommentService {
         themePreference: newComment.user.themePreference as any,
         createdAt: newComment.user.createdAt.toISOString(),
       },
-      attachments: newComment.attachments.map((a) => ({
+      attachments: newComment.attachments.map((a: any) => ({
         id: a.id,
         fileName: a.fileName,
         fileKey: a.fileKey,
@@ -248,6 +266,13 @@ export class CommentService {
         createdAt: a.createdAt.toISOString(),
       })),
     };
+
+    emitToProject(issue.projectId, 'issue:comment_added', {
+      issueId: issue.id,
+      comment: result,
+    });
+
+    return result;
   }
 
   /**

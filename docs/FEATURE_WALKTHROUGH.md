@@ -277,3 +277,13 @@ This document records the incremental implementation walkthrough for every compl
   - **Broadcast Utilities**: Created modular dispatch helpers (`emitToProject`, `emitToUser`, `emitToAll`) to broadcast domain events cleanly across services without tight coupling.
   - **Frontend Socket Lifecycle**: Implemented singleton `socketService` and React hooks (`useSocketInit`, `useProjectSocket`, `useSocketEvent`), automatically connecting with Redux auth credentials and disconnecting cleanly on logout.
 - **Verification**: 6 Vitest integration tests in `socket.test.ts` verifying unauthenticated connection rejection, invalid token rejection, auto-joining user rooms, project room broadcasts, and access-control enforcement. 5 Vitest unit tests in `socket.service.test.ts` verifying client connection, room events, and teardown. 105 backend tests and 36 frontend tests passing (141 monorepo tests total). Monorepo typechecks and Vite build succeed cleanly.
+
+### Milestone 8.2: Real-Time Kanban Board Updates & Broadcasts
+- **Status**: Completed
+- **Changes**:
+  - `apps/web/src/pages/KanbanBoardPage.tsx`: Connected Kanban board to project rooms via `useProjectSocket(selectedProjectId)`. Added listeners for `issue:status_changed`, `issue:created`, and `issue:deleted` that update the TanStack Query cache dynamically.
+  - `apps/web/src/pages/IssueDetailPage.tsx`: Connected issue detail view to project room with live status update and new comment synchronization.
+  - `apps/web/src/hooks/useSocket.ts`: Upgraded `useSocketEvent` with `useRef` to guarantee stable listener references without re-binding cycles.
+  - `apps/api/src/modules/comments/comment.service.ts`: Ensured resilient fallback and null safety in real-time notification socket payload dispatch.
+  - `apps/web/src/pages/KanbanBoardPage.test.tsx`: Added unit/integration tests verifying incoming socket events trigger instant column card moves, ticket insertions, and deletions.
+- **Verification**: 5 tests in `KanbanBoardPage.test.tsx`, 3 tests in `IssueDetailPage.test.tsx`, 105 backend tests, 39 frontend tests passing (144 total monorepo tests passing). Zero TypeScript errors.

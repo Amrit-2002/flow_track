@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppSelector } from './useRedux';
 import { socketService } from '../services/socket.service';
 
@@ -37,17 +37,23 @@ export function useProjectSocket(projectId?: string | null): void {
 }
 
 /**
- * Hook to listen for a specific real-time event
+ * Hook to listen for a specific real-time event with stable listener reference
  */
 export function useSocketEvent<T = unknown>(
   event: string,
   handler: (data: T) => void
 ): void {
+  const handlerRef = useRef(handler);
+  handlerRef.current = handler;
+
   useEffect(() => {
-    socketService.on(event, handler);
+    const listener = (data: T) => {
+      handlerRef.current?.(data);
+    };
+    socketService.on(event, listener);
 
     return () => {
-      socketService.off(event, handler);
+      socketService.off(event, listener);
     };
-  }, [event, handler]);
+  }, [event]);
 }
