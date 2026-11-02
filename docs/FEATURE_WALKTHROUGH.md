@@ -157,3 +157,14 @@ This document records the incremental implementation walkthrough for every compl
   - **4-Stage Pipeline Tracking**: Preserves individual tracking across Development, Unit Testing, Staging, and Production stages (`New`, `In-progress`, `Completed`, `On-hold`, `NA`).
   - **Date Validation**: Enforces `startDate <= endDate` at both the Zod validation layer and service layer.
 - **Verification**: 12 Vitest integration tests (6 in `apps/api/src/modules/clients/client.test.ts` and 6 in `apps/api/src/modules/tasks/task.test.ts`) covering CRUD, ownership isolation, date validation, and soft deletions. Total 47 backend tests passing. Monorepo typecheck passed with 0 errors.
+
+---
+
+## Milestone 5.3: Frontend Issue Management UI & Multi-Filter Backlog
+- **Status**: Completed
+- **Summary**: Delivered end-to-end frontend interfaces for managing project issues and subtasks with real-time filtering, search, and responsive editing workflows.
+- **Key Implementation Decisions**:
+  - **Dynamic Multi-Filter Toolbar**: Supports combined filtering across projects, statuses, priorities, types, and keyword search with TanStack Query caching and automatic pagination resets.
+  - **Context-Aware Modal Dialogs**: `CreateIssueModal` dynamically fetches members of the chosen project for the assignee dropdown, and fetches existing top-level issues in that project so users can seamlessly create subtasks.
+  - **Direct CRUD Workflows**: Issues list provides immediate modal triggers for editing titles, priorities, and descriptions, alongside safe deletion with confirmation dialogs.
+- **Verification**: Component test in `IssuesPage.test.tsx` verifying filter toolbar, issue rows, priority badges, and empty states. 9 web tests and 47 backend tests passing (56 total monorepo tests). Vite production build succeeded in 8.08s. Monorepo typecheck passed cleanly with 0 errors.

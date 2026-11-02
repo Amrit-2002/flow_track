@@ -59,3 +59,7 @@ This log tracks every Git commit made throughout the incremental development of 
 ### Commit 14: `feat(tasks): implement legacy task tracker and client management APIs`
 - **Scope**: Backend Legacy Task/Bug Tracker & Client Management.
 - **Details**: Preserved Laravel's original Client and Task management capabilities by creating dedicated modular APIs for Clients (`/api/v1/clients`) and 4-stage pipeline Tasks (`/api/v1/tasks`). Enforces ownership isolation with global Admin override, date range validation (`startDate <= endDate`), multi-status stages (`devStatus`, `unitTestStatus`, `stagingStatus`, `prodStatus`), soft-deletion with `deletedAt`, and search/pagination. Verified through 12 Vitest integration tests (6 for clients, 6 for tasks). Total 47 passing backend tests.
+
+### Commit 15: `feat(issues): build issue tracking UI with filter toolbar and modal workflows`
+- **Scope**: Frontend Issue Management, Filtering Toolbar, and Modal Dialogs.
+- **Details**: Built `issueService` and `statusService` connecting to backend issue and board status REST endpoints. Implemented interactive `IssuesPage` with multi-filter toolbar (search by title/description, project dropdown, status dropdown, priority selector, type selector), responsive issue rows with priority badges, status badges, assignee avatars, subtask parent indicators, and inline edit/delete actions. Built `CreateIssueModal` and `EditIssueModal` with dynamic assignee and parent issue loading based on selected project. Verified through Vitest component tests and successful Vite production build.
