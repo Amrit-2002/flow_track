@@ -20,6 +20,7 @@ import { useSocketInit } from '../hooks/useSocket';
 import { toggleTheme } from '../store/themeSlice';
 import { logout } from '../store/authSlice';
 import { cn } from '../utils/cn';
+import { NotificationBell } from '../components/notifications/NotificationBell';
 
 interface NavItem {
   name: string;
@@ -58,6 +59,7 @@ export const DashboardLayout: React.FC = () => {
           <span className="font-bold text-lg tracking-tight">FlowTrack</span>
         </div>
         <div className="flex items-center space-x-2">
+          <NotificationBell />
           <button
             onClick={() => dispatch(toggleTheme())}
             className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
@@ -166,6 +168,22 @@ export const DashboardLayout: React.FC = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        {/* Top Navbar */}
+        <header className="hidden lg:flex h-16 px-8 border-b border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md items-center justify-between sticky top-0 z-30">
+          <div className="flex items-center space-x-3 text-slate-500 text-xs">
+            <span className="font-semibold text-slate-800 dark:text-slate-200 text-sm">FlowTrack Workspace</span>
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-medium text-[11px] border border-emerald-200/60 dark:border-emerald-800/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Real-Time Sync</span>
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <NotificationBell />
+          </div>
+        </header>
+
         <main className="flex-1 p-6 lg:p-8 max-w-7xl mx-auto w-full">
           <Outlet />
         </main>

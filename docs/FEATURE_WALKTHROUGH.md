@@ -287,3 +287,15 @@ This document records the incremental implementation walkthrough for every compl
   - `apps/api/src/modules/comments/comment.service.ts`: Ensured resilient fallback and null safety in real-time notification socket payload dispatch.
   - `apps/web/src/pages/KanbanBoardPage.test.tsx`: Added unit/integration tests verifying incoming socket events trigger instant column card moves, ticket insertions, and deletions.
 - **Verification**: 5 tests in `KanbanBoardPage.test.tsx`, 3 tests in `IssueDetailPage.test.tsx`, 105 backend tests, 39 frontend tests passing (144 total monorepo tests passing). Zero TypeScript errors.
+
+### Milestone 8.3: Notification Center API & Bell Notification Tray
+- **Status**: Completed
+- **Changes**:
+  - `apps/api/src/modules/notifications`: Created full notification module (`notification.service.ts`, `notification.controller.ts`, `notification.routes.ts`) providing `GET /api/v1/notifications`, `PATCH /api/v1/notifications/:id/read`, `POST /api/v1/notifications/read-all`, and `DELETE /api/v1/notifications/:id`.
+  - `packages/shared/src/types/index.ts`: Defined `NotificationsListResponseDTO` and rebuilt shared package.
+  - `apps/web/src/services/notification.service.ts`: Built frontend client for notification queries and mutations.
+  - `apps/web/src/components/notifications/NotificationBell.tsx`: Interactive notification tray with unread badge counter, empty state, feed items, relative time formatting, quick-read/delete actions, issue deep-linking, and `useSocketEvent('notification:new')` listener.
+  - `apps/web/src/layouts/DashboardLayout.tsx`: Mounted `NotificationBell` in sticky desktop navbar and mobile drawer header.
+  - `apps/api/src/modules/notifications/notification.test.ts`: Added 6 Vitest backend integration tests.
+  - `apps/web/src/components/notifications/NotificationBell.test.tsx`: Added 4 Vitest frontend unit tests.
+- **Verification**: 111 backend tests across 14 suites, 43 frontend tests across 14 suites (154 monorepo tests total, all passing). Monorepo typecheck 0 errors. Vite production build succeeds.

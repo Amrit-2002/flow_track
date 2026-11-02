@@ -206,6 +206,11 @@ export interface NotificationDTO {
   createdAt: string;
 }
 
+export interface NotificationsListResponseDTO {
+  notifications: NotificationDTO[];
+  unreadCount: number;
+}
+
 export interface SavedFilterDTO {
   id: string;
   userId: string;
