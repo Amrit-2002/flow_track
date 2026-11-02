@@ -21,3 +21,4 @@ notificationRouter.patch('/:id/read', (req, res, next) =>
 notificationRouter.delete('/:id', (req, res, next) =>
   notificationController.deleteNotification(req, res, next)
 );
+

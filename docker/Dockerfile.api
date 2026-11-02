@@ -52,3 +52,4 @@ USER flowtrack
 EXPOSE 5000
 
 CMD ["node", "apps/api/dist/server.js"]
+

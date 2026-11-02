@@ -1,4 +1,4 @@
-# FlowTrack — Modern Full-Stack Project & Issue Management Platform
+# FlowTrack — Full-Stack Project & Issue Management Platform
 
 [![CI Pipeline](https://github.com/Amrit-2002/FlowTrack/actions/workflows/ci.yml/badge.svg)](https://github.com/Amrit-2002/FlowTrack/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -6,23 +6,23 @@
 [![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-4.19-000000?logo=express)](https://expressjs.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)](https://www.postgresql.org/)
-[![Prisma](https://img.shields.io/badge/Prisma-5.18-2D3748?logo=prisma)](https://www.prisma.io/)
+[![Prisma](https://img.shields.io/badge/Prisma-5.22-2D3748?logo=prisma)](https://www.prisma.io/)
 [![Socket.IO](https://img.shields.io/badge/Socket.IO-4.7-010101?logo=socket.io)](https://socket.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 [![Vitest](https://img.shields.io/badge/Vitest-2.1-729B1B?logo=vitest)](https://vitest.dev/)
 [![Playwright](https://img.shields.io/badge/Playwright-1.46-2EAD33?logo=playwright)](https://playwright.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-**FlowTrack** is a production-grade, commercial-quality project management, issue tracking, and collaborative workflow platform. Originally developed in Laravel 11 / Blade / MySQL, it has been completely re-architected and migrated into a high-performance **TypeScript monorepo** powered by **React 18, Express.js, PostgreSQL (Prisma ORM), and real-time WebSockets (Socket.IO)**.
+**FlowTrack** is a high-performance, enterprise-grade project management, issue tracking, and collaborative workflow platform built from the ground up as a modern **TypeScript monorepo**. It unites **React 18, Node.js / Express, PostgreSQL (Prisma ORM), and real-time WebSockets (Socket.IO)** to deliver an instantaneous, lag-free collaborative experience.
 
-Designed for 100% free-tier cloud deployment across **Vercel** (Frontend SPA), **Render** (Node.js API), and **Neon / Supabase** (Serverless PostgreSQL).
+Engineered with a **Modular Monolith** architecture, FlowTrack features optimistic UI updates, strict workflow state-machine validation, subtask hierarchy, granular work time tracking, file attachment storage, and in-app notification centers.
 
 ---
 
 ## 🌟 Key Features
 
-- **Executive Analytics Dashboard**: High-level KPI metrics, active issue distribution charts (Recharts), bottleneck status detection, top contributor spotlights, and recent project activity audit streams.
-- **Enterprise Project Management**: Multi-project workspaces with unique keys (`COMM`, `INFRA`), project membership role-based access control (`ADMIN`, `MEMBER`), and client associations.
+- **Executive Analytics Dashboard**: High-level KPI metrics cards, active issue distribution charts (Recharts), bottleneck status detection, top contributor spotlights, and recent activity audit streams.
+- **Enterprise Project Workspaces**: Multi-project workspaces with unique keys (`COMM`, `INFRA`), project membership role-based access control (`ADMIN`, `MEMBER`), and client associations.
 - **Hierarchical Issue Tracking**: Subtask tree structures, issue priorities (`HIGH`, `MEDIUM`, `LOW`), issue types (`BUG`, `FEATURE`, `TASK`, `IMPROVEMENT`), Markdown descriptions, and custom saved filter views.
 - **Interactive Kanban Board**: Drag-and-drop workflow progression with **optimistic UI updates** and instant rollback on failure, backed by strict state-machine transition validation rules.
 - **Automated Workflow Engine**: Configurable status transition graph preventing illegal state leaps (e.g., jumping from `To Do` straight to `Done` without review).
@@ -30,205 +30,244 @@ Designed for 100% free-tier cloud deployment across **Vercel** (Frontend SPA), *
 - **Work Time Logging**: Granular work duration tracking with automatic minutes-to-hours aggregation and per-issue audit logs.
 - **Real-Time Collaboration**: Authenticated Socket.IO architecture with project rooms (`project:<id>`), live Kanban updates across concurrent sessions, and targeted personal alerts (`user:<id>`).
 - **In-App Notification Center**: Dropdown notification tray with unread badge counter, relative timestamps, type-specific badges, read/unread filters, and deep-link issue navigation.
-- **Legacy 4-Stage Task Tracker**: Preserved from the original Laravel application for linear delivery monitoring (`Dev` → `Unit Test` → `Staging` → `Prod`) with client tracking.
+- **4-Stage Task Pipeline**: Dedicated task delivery tracker for linear stage progression (`Dev` → `Unit Test` → `Staging` → `Prod`) with client associations.
 - **Theme Customization**: Fluid dark and light mode system persisted across sessions.
 
 ---
 
-## 🏗️ System Architecture
-
-FlowTrack follows a **Modular Monolith** architecture within an npm workspaces monorepo:
+## 🏗️ Monorepo Architecture
 
 ```
 flowtrack/
 ├── apps/
-│   ├── web/                     # React 18 + Vite Frontend SPA
+│   ├── web/                         # React 18 + Vite Frontend SPA (Port 5173)
 │   │   ├── src/
-│   │   │   ├── components/      # UI components (Kanban, Modals, Timeline, Notifications)
-│   │   │   ├── layouts/         # Responsive Dashboard Layout with Live Sync Topbar
-│   │   │   ├── pages/           # Route views (Dashboard, Projects, Issues, Kanban, Tasks, Clients)
-│   │   │   ├── services/        # Axios API clients & WebSocket singleton
-│   │   │   ├── store/           # Redux Toolkit client state (auth, theme)
-│   │   │   └── hooks/           # Custom React hooks (useSocket, useProjectSocket, useRedux)
-│   │   └── vercel.json          # Vercel SPA routing rewrite rules
+│   │   │   ├── components/          # Kanban, Modals, Timeline, TimeLog, NotificationBell
+│   │   │   ├── layouts/             # DashboardLayout with Live Sync Topbar & Drawer
+│   │   │   ├── pages/               # Dashboard, Projects, Issues, Kanban, Tasks, Clients, Login
+│   │   │   ├── services/            # Axios API clients & WebSocket singleton
+│   │   │   ├── store/               # Redux Toolkit (client state: auth, theme)
+│   │   │   └── hooks/               # useSocket, useProjectSocket, useSocketEvent, useRedux
+│   │   └── vercel.json              # Vercel SPA routing rewrite rules & cache headers
 │   │
-│   └── api/                     # Node.js + Express + TypeScript Backend
+│   └── api/                         # Express.js + TypeScript REST & Socket API (Port 5000)
 │       ├── src/
-│       │   ├── middleware/      # JWT auth, RBAC guards, Multer upload, Error handler
-│       │   ├── modules/         # Domain feature modules (Thin controllers, Fat services)
-│       │   │   ├── auth/        # Dual-token JWT rotation & bcrypt hashing
-│       │   │   ├── projects/    # Project CRUD & membership RBAC
-│       │   │   ├── issues/      # Issues, subtasks, and activity logger
-│       │   │   ├── workflows/   # Directed-graph transition engine
-│       │   │   ├── comments/    # Comment threads & attachment handling
-│       │   │   ├── time-logs/   # Work duration logging & aggregation
-│       │   │   ├── saved-filters/# Custom user query views
-│       │   │   ├── notifications/# Notification center & unread counts
-│       │   │   └── dashboard/   # Aggregated analytics query engine
-│       │   ├── sockets/         # Authenticated Socket.IO rooms & event dispatchers
-│       │   └── app.ts           # Express application setup
+│       │   ├── middleware/          # JWT auth, RBAC guards, Multer upload, Centralized error handling
+│       │   ├── modules/             # Modular monolith feature domains
+│       │   │   ├── auth/            # Dual-token JWT rotation & bcrypt hashing
+│       │   │   ├── projects/        # Project CRUD & membership RBAC
+│       │   │   ├── issues/          # Issues, subtasks, and automated activity logging
+│       │   │   ├── workflows/       # Directed-graph transition engine
+│       │   │   ├── comments/        # Comment threads & file attachment storage
+│       │   │   ├── time-logs/       # Work duration logging & aggregation
+│       │   │   ├── saved-filters/   # Custom user query views
+│       │   │   ├── notifications/   # In-app notification center & unread counters
+│       │   │   └── dashboard/       # Aggregated KPI analytics engine
+│       │   ├── sockets/             # Authenticated Socket.IO rooms (`project:<id>`, `user:<id>`)
+│       │   └── app.ts               # Express application configuration
 │       └── prisma/
-│           └── schema.prisma    # PostgreSQL database schema & relations
+│           └── schema.prisma        # PostgreSQL schema with relational indexes & soft deletes
 │
 ├── packages/
-│   └── shared/                  # Common TypeScript interfaces, Zod schemas & constants
-├── e2e/                         # Playwright End-to-End test suites
-├── docker/                      # Multi-stage Dockerfiles & Nginx configurations
-├── .github/workflows/           # Automated GitHub Actions CI pipeline
-├── render.yaml                  # Render Cloud blueprint
-└── docker-compose.yml           # Local multi-container development orchestration
+│   └── shared/                      # Single source of truth for DTOs, Zod schemas & constants
+├── e2e/                             # Playwright automated End-to-End test suites
+├── docker/                          # Multi-stage Dockerfiles (API + Nginx Web)
+├── .github/workflows/ci.yml         # GitHub Actions continuous integration pipeline
+├── render.yaml                      # Infrastructure-as-code blueprint for Render
+├── docker-compose.yml               # Multi-container orchestration (PostgreSQL 16 + API + Web)
+└── LICENSE                          # MIT Open Source License
 ```
 
 ---
 
-## 🔄 Technology Comparison: Laravel 11 vs. React / Node Stack
+## ⚡ Tech Stack & Architectural Decisions
 
-| Dimension | Original Laravel 11 Stack | Migrated Modern Stack | Architectural Benefit |
-| :--- | :--- | :--- | :--- |
-| **Frontend** | Blade Templates + Alpine.js | React 18 + TypeScript + Vite | Component modularity, rich interactivity, static edge hosting on Vercel CDN |
-| **Backend** | PHP 8.2 + Laravel Framework | Node.js + Express.js + TypeScript | Non-blocking event loop, unified language across stack, native WebSocket support |
-| **State Management** | Full-page reloads / Alpine state | Redux Toolkit + TanStack Query | Client state vs server state separation, background caching, optimistic UI |
-| **Database ORM** | Eloquent (Active Record) | Prisma ORM (Data Mapper pattern) | Compile-time type-safety, auto-generated migrations, strict foreign key constraints |
-| **Real-Time** | Laravel Echo + Pusher (paid tier) | Native Socket.IO + Express | Zero-cost self-hosted WebSockets, room-based security, instant bidirectional events |
-| **Styling** | Tailwind CSS CDN | Tailwind CSS + Lucide React + shadcn UI | Tree-shaken CSS bundle, accessible modern UI components, fluid dark mode |
-| **Testing** | Pest PHP | Vitest + React Testing Library + Playwright | 154 unit/integration tests + 10 E2E tests, sub-second test execution |
+| Layer | Technologies | Architectural Rationale |
+| :--- | :--- | :--- |
+| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, Lucide Icons | Component-driven SPA, sub-second Hot Module Replacement, zero runtime CSS bloat. |
+| **State Management** | Redux Toolkit + TanStack Query | Clean separation of concerns: Redux manages client UI state (auth session, theme mode); TanStack Query manages asynchronous server state with intelligent background caching and garbage collection. |
+| **Backend** | Node.js 20, Express.js, TypeScript | High-concurrency event-driven architecture, modular structure with thin controllers and typed domain services. |
+| **Database & ORM** | PostgreSQL 16, Prisma ORM | Relational integrity, compile-time query type-safety, declarative schema migrations, automated indexes, and connection pooling support. |
+| **Real-Time** | Socket.IO | Bi-directional WebSocket communication with fallback polling, JWT handshake authentication, and room-level access control. |
+| **Security** | bcrypt, Helmet, CORS, HTTP-only Cookies | Dual-token authentication with refresh token rotation, XSS prevention, and CSRF mitigation. |
+| **Testing** | Vitest, Supertest, React Testing Library, Playwright | Comprehensive 3-tier testing pyramid: fast unit tests, API integration tests, and multi-server browser automation. |
+| **DevOps** | Docker, Docker Compose, GitHub Actions | Multi-stage container builds, automated CI quality gates, and zero-cost cloud deployment manifests. |
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## 🚀 Quick Start (Running Locally)
 
 ### Prerequisites
-- **Node.js**: `v20.x` or higher
-- **PostgreSQL**: `v16.x` running locally on port 5432 (or Docker)
+- **Node.js**: `v20.x` or `v22.x`
+- **PostgreSQL**: Running locally on port `5432` (or via Docker)
 - **Git**
 
-### 1. Clone & Install Dependencies
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/Amrit-2002/FlowTrack.git
 cd flowtrack
+```
 
-# Install dependencies across all monorepo workspaces
+### 2. Install Monorepo Dependencies
+```bash
 npm install
 ```
 
-### 2. Configure Environment Variables
-Create `.env` inside `apps/api`:
+### 3. Setup Environment Variables
+FlowTrack includes pre-configured environment configurations for local development:
+
+Inside `apps/api/.env` (and root `.env`):
 ```env
 PORT=5000
 NODE_ENV=development
 DATABASE_URL="postgresql://postgres:password@localhost:5432/flowtrack?schema=public"
-JWT_ACCESS_SECRET="flowtrack_super_secret_access_jwt_key_2026_dev_min32chars"
-JWT_REFRESH_SECRET="flowtrack_super_secret_refresh_jwt_key_2026_dev_min32chars"
-ACCESS_TOKEN_EXPIRES_IN="15m"
+DIRECT_URL="postgresql://postgres:password@localhost:5432/flowtrack?schema=public"
+JWT_SECRET="flowtrack_super_secret_jwt_key_at_least_32_characters_long"
+JWT_EXPIRES_IN="15m"
 REFRESH_TOKEN_EXPIRES_IN="7d"
 CORS_ORIGIN="http://localhost:5173"
+CLIENT_URL="http://localhost:5173"
+STORAGE_PROVIDER="local"
 ```
 
-Create `.env` inside `apps/web`:
+Inside `apps/web/.env`:
 ```env
-VITE_API_URL="http://localhost:5000/api/v1"
-VITE_WS_URL="http://localhost:5000"
+VITE_API_BASE_URL="http://localhost:5000/api/v1"
+VITE_SOCKET_URL="http://localhost:5000"
 ```
 
-### 3. Database Migration & Seeding
-```bash
-# Generate Prisma Client
-npm run db:generate
+*(Adjust `postgres:password` if your local PostgreSQL password differs).*
 
-# Apply database migrations
+### 4. Run Migrations & Seed Sample Data
+Execute the database setup command to create tables and populate initial demo data:
+```bash
+# Generate Prisma Client & apply migrations
 npm run db:migrate
 
-# Seed demo users, workflow statuses, and sample tickets
+# Seed demo users, workflow statuses, projects, issues, comments, and time logs
 npm run db:seed
 ```
 
-### 4. Start Development Servers
+### 5. Launch the Application
+Start both the backend API and frontend Vite development server concurrently:
 ```bash
-# Starts both Backend API (port 5000) and Frontend Web (port 5173) in parallel
 npm run dev
 ```
 
-Visit **`http://localhost:5173`** in your browser.
+- **Frontend App**: Open [http://localhost:5173](http://localhost:5173) in your browser.
+- **Backend REST API**: [http://localhost:5000/api/v1](http://localhost:5000/api/v1)
+- **Health Check Probe**: [http://localhost:5000/health](http://localhost:5000/health)
 
 ---
 
-## 🔑 Demo Login Credentials
+## 🔑 Pre-Configured Demo Accounts
 
-The database seeder automatically provides 3 pre-configured demo user accounts:
+The database seeder automatically provides 3 accounts with distinct permission tiers:
 
 | Role | Email | Password | Access Capabilities |
 | :--- | :--- | :--- | :--- |
-| **Admin** | `admin@flowtrack.dev` | `password123` | Full system access, all projects, user management, project creation |
-| **Manager** | `manager@flowtrack.dev` | `password123` | Project lead, create projects, manage project members, assign issues |
-| **Developer** | `user@flowtrack.dev` | `password123` | Project contributor, view assigned issues, transition statuses, log time |
+| **Admin** | `admin@flowtrack.dev` | `password123` | Full administrative privileges, manage all projects, system users, and global settings |
+| **Manager** | `manager@flowtrack.dev` | `password123` | Project manager, create projects, manage project members, assign issues |
+| **Developer** | `user@flowtrack.dev` | `password123` | Contributor access, view assigned issues, transition Kanban statuses, log work time |
 
-*(One-click demo login buttons are provided on the login page for instant access without typing credentials).*
+*(The login screen also provides convenient **one-click demo login buttons** to sign in instantly as any role without typing).*
 
 ---
 
-## 🧪 Comprehensive Quality Assurance & Testing
+## 🧪 Testing & Quality Assurance
 
-The repository maintains strict test coverage across unit, integration, and end-to-end tiers:
+FlowTrack maintains test coverage across the entire stack:
 
 ```bash
-# Run all 154 unit & integration test suites
+# Run full unit & integration test suite (154 tests)
 npm test
 
-# Run backend API tests only (111 tests)
+# Run backend API integration tests only (111 tests)
 npm --workspace=@flowtrack/api test
 
-# Run frontend Web tests only (43 tests)
+# Run frontend React component tests only (43 tests)
 npm --workspace=@flowtrack/web test
 
-# Run TypeScript compile validation across all workspaces (0 errors)
+# Run TypeScript compilation check across all 3 workspaces (0 errors)
 npm run typecheck
 
-# Run Playwright End-to-End test suites
+# Run Playwright End-to-End automated browser tests
 npm run test:e2e
 ```
 
-### Test Suite Summary:
-- **Backend (`@flowtrack/api`)**: 111 tests across 14 test suites verifying JWT rotation, RBAC enforcement, workflow state transitions, comments, attachments, time logs, activity timelines, notifications, and real-time Socket.IO rooms.
-- **Frontend (`@flowtrack/web`)**: 43 tests across 14 test suites verifying auth state, route guards, Kanban optimistic updates, modals, time tracking, activity history, and notification tray reactivity.
-- **End-to-End (`e2e/`)**: 10 Playwright tests verifying complete user journeys across multi-server environments.
+### Test Coverage Highlights:
+- **Backend (`@flowtrack/api`)**: 111 tests across 14 test suites verifying dual-token JWT authentication, RBAC permission guards, workflow transition state rules, comments, multi-file attachments, time logs, activity timelines, notifications, and Socket.IO rooms.
+- **Frontend (`@flowtrack/web`)**: 43 tests across 14 test suites verifying auth state, route guards, Kanban optimistic column moves, modals, time tracking, activity history, and real-time notification alerts.
+- **End-to-End (`e2e/`)**: 10 Playwright tests verifying full user journeys across login, theme switching, project management, Kanban, and notification drawers.
 
 ---
 
 ## ☁️ Free-Tier Cloud Deployment
 
-FlowTrack is optimized for zero-cost deployment:
+FlowTrack is pre-configured for **100% free-tier** deployment across industry-standard cloud providers:
 
-1. **Database**: [Neon](https://neon.tech) / [Supabase](https://supabase.com) (Serverless PostgreSQL with connection pooling).
-2. **Backend**: [Render](https://render.com) Web Service with blueprint configuration via [`render.yaml`](./render.yaml).
-3. **Frontend**: [Vercel](https://vercel.com) Edge Network with SPA routing rules via [`vercel.json`](./apps/web/vercel.json).
+```
+ ┌─────────────────────────────────────────────────────────────┐
+ │                       Vercel (Hobby)                        │
+ │  React 18 + Vite SPA · Tailwind CSS · Global Edge CDN       │
+ │  URL: https://flowtrack-web.vercel.app                      │
+ └──────────────┬──────────────────────────────▲───────────────┘
+                │                              │
+       HTTPS REST API Calls           Real-Time Socket.IO
+      (Bearer JWT in Header)         (WebSocket / Polling)
+                │                              │
+ ┌──────────────▼──────────────────────────────┴───────────────┐
+ │                     Render Web Service                      │
+ │  Express.js API · Node.js 20 · Socket.IO Server             │
+ │  URL: https://flowtrack-api.onrender.com                    │
+ └──────────────┬──────────────────────────────────────────────┘
+                │
+       Prisma Query Engine (PgBouncer Pooled Conn)
+ ┌──────────────▼──────────────┐
+ │   Neon / Supabase Postgres  │
+ │   Free 500MB DB · PG 16     │
+ └─────────────────────────────┘
+```
 
-For complete step-by-step deployment instructions, refer to **[docs/FREE_HOSTING_DEPLOYMENT.md](./docs/FREE_HOSTING_DEPLOYMENT.md)**.
+### 1. Database (Neon / Supabase)
+1. Create a free PostgreSQL instance at [Neon](https://neon.tech) or [Supabase](https://supabase.com).
+2. Copy the connection pooling URI into `DATABASE_URL` and direct URI into `DIRECT_URL`.
+3. Run `npm run db:migrate` and `npm run db:seed` to initialize the database.
+
+### 2. Backend (Render Web Service)
+1. In Render, select **New Blueprint** and connect your repository.
+2. Render automatically detects [`render.yaml`](./render.yaml), sets up the Node.js 20 environment, and builds via `npm run build:api`.
+3. Set `DATABASE_URL` and `CORS_ORIGIN` in environment variables.
+4. Set Health Check Path to `/health`.
+
+### 3. Frontend (Vercel)
+1. In Vercel, import the repository and set **Root Directory** to `apps/web`.
+2. Configure environment variables:
+   - `VITE_API_BASE_URL` = `https://your-api.onrender.com/api/v1`
+   - `VITE_SOCKET_URL` = `https://your-api.onrender.com`
+3. [`apps/web/vercel.json`](./apps/web/vercel.json) automatically handles SPA catch-all rewrites and asset caching.
 
 ---
 
 ## 🐳 Docker Deployment
 
-Run the complete multi-container production stack locally with a single command:
+To spin up the entire production stack locally with containerized PostgreSQL:
 
 ```bash
+# Build and run containers in background
 docker-compose up --build -d
+
+# Check status
+docker-compose ps
+
+# Access applications:
+# Frontend SPA: http://localhost:3000
+# Backend API:  http://localhost:5000/api/v1
+# Health Check: http://localhost:5000/health
+
+# Stop containers:
+docker-compose down
 ```
-- Frontend: `http://localhost:3000`
-- Backend API: `http://localhost:5000/api/v1`
-- Health Probe: `http://localhost:5000/health`
-
----
-
-## 📚 Technical Documentation & Interview Guides
-
-- **[Architecture Deep-Dive](./docs/ARCHITECTURE.md)**: Modular monolith structure, data flow, and real-time WebSocket room design.
-- **[Database Design](./docs/DATABASE_DESIGN.md)**: PostgreSQL schema, relational integrity, indexes, and ER diagrams.
-- **[API Specification](./docs/API_DESIGN.md)**: Complete REST endpoint documentation and response schemas.
-- **[Laravel to Node/React Migration Mapping](./docs/OLD_TO_NEW_MAPPING.md)**: Detailed mapping of original Laravel models, controllers, and Blade templates to modern equivalents.
-- **[Learning Guide](./docs/LEARNING_GUIDE.md)**: Architectural patterns, ORM comparison, and dual-token authentication mechanics.
-- **[Interview Talking Points](./docs/IMPORTANT_CONCEPTS.md)**: Senior engineering discussion points, system tradeoffs, and scalability considerations.
-- **[Feature Walkthrough](./docs/FEATURE_WALKTHROUGH.md)**: Exhaustive walkthrough of every migrated feature.
-- **[Git Commit History](./docs/GIT_HISTORY.md)**: Chronological narrative of all 30+ atomic milestone commits.
 
 ---
 

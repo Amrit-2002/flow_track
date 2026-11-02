@@ -49,3 +49,4 @@ test.describe('Platform Navigation & Core Modules', () => {
     await expect(page.getByText('Notifications')).toBeVisible();
   });
 });
+

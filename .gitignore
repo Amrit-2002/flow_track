@@ -3,6 +3,9 @@ node_modules/
 .pnp
 .pnp.js
 
+# Documentation (Local reference only)
+docs/
+
 # Build Outputs
 dist/
 build/

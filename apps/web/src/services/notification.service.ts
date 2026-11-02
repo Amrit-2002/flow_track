@@ -46,3 +46,4 @@ export const notificationService = {
     await api.delete(`/notifications/${id}`);
   },
 };
+
