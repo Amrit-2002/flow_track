@@ -129,3 +129,8 @@ This log tracks every Git commit made throughout the incremental development of 
 - **Commit**: `docs: add comprehensive free-tier hosting deployment guide`
 - **Scope**: `docs/FREE_HOSTING_DEPLOYMENT.md`
 - **Details**: Authored complete step-by-step production deployment documentation covering Neon/Supabase PostgreSQL connection pooling setup, Render Web Service configuration, Vercel SPA deployment, cold start mitigation strategies via free pingers, cross-origin CORS/cookie configuration, and local Docker Compose deployment instructions.
+
+### 31. Milestone 11: System Documentation, Learning Guides & Portfolio Polish
+- **Commit**: `docs: finalize system documentation, learning guides, and portfolio README`
+- **Scope**: `README.md`, `LICENSE`, `docs/LEARNING_GUIDE.md`, `docs/IMPORTANT_CONCEPTS.md`, `docs/FEATURE_WALKTHROUGH.md`, `docs/GIT_HISTORY.md`
+- **Details**: Authored master root `README.md` with CI badges, architecture diagrams, live demo credentials, technology comparisons, testing guides, and free-tier hosting highlights. Added MIT `LICENSE`. Deepened `docs/LEARNING_GUIDE.md` with in-depth Laravel vs React/Node paradigm shift analyses (Active Record vs Data Mapper, Blade vs Virtual DOM, Breeze vs Dual-Token JWT, Pusher vs Socket.IO). Expanded `docs/IMPORTANT_CONCEPTS.md` with senior software engineering interview talking points and model answers covering optimistic UI updates, WebSocket room isolation, workflow integrity, and cold-start resilience.
