@@ -3,6 +3,7 @@ import { issueController } from './issue.controller.js';
 import { commentController } from '../comments/comment.controller.js';
 import { attachmentController } from '../attachments/attachment.controller.js';
 import { timeLogController } from '../time-logs/time-log.controller.js';
+import { activityController } from '../activities/activity.controller.js';
 import { upload } from '../attachments/storage.service.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { validateRequest } from '../../middleware/validate.js';
@@ -31,6 +32,10 @@ router.post('/:issueId/attachments', upload.single('file'), attachmentController
 // Nested time log routes
 router.get('/:issueId/time-logs', timeLogController.list);
 router.post('/:issueId/time-logs', validateRequest(createTimeLogSchema), timeLogController.create);
+
+// Nested activity history routes
+router.get('/:id/activities', (req, res, next) => activityController.listForIssue(req, res, next));
+router.get('/:issueId/activities', (req, res, next) => activityController.listForIssue(req, res, next));
 
 export const issueRouter = router;
 export default router;

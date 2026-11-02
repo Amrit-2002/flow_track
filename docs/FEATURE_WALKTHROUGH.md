@@ -241,3 +241,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Interactive Modal & Calculation UI**: Built `LogTimeModal.tsx` supporting hours/minutes inputs with live minute calculations, work date picker, and optional work description.
   - **Sidebar Time Tracking Widget**: Built `TimeLogSection.tsx` in `IssueDetailPage.tsx` displaying total time badges (e.g. `2h 45m`), item counts, individual work entries, and deletion controls with author/admin permission checks.
 - **Verification**: 11 Vitest integration tests in `time-log.test.ts` verifying authentication (401), non-member forbidden access (403), not-found checks (404), validation rules, transactional activity logging, and author/admin delete guards. 5 Vitest component tests in `LogTimeModal.test.tsx` and updated `IssueDetailPage.test.tsx`. 83 backend tests and 23 frontend tests passing (106 monorepo tests total). Monorepo typechecks and Vite build succeed cleanly.
+
+---
+
+## Milestone 7.2: Issue Change History & Activity Audit Timeline
+- **Status**: Completed
+- **Summary**: Delivered automated issue change audit trail tracking and chronological visual activity timeline UI.
+- **Key Implementation Decisions**:
+  - **Modular Activity API**: Built `modules/activities/` with `ActivityService` and `ActivityController`, providing `GET /api/v1/issues/:id/activities` and `GET /api/v1/projects/:id/activities` with project membership verification.
+  - **Comprehensive Domain Event Auditing**: Captured transactional activity logs across the entire issue lifecycle: issue creation (`CREATED`), workflow transitions (`STATUS_CHANGED`), priority updates (`PRIORITY_CHANGED`), assignments (`ASSIGNED`), time logs (`TIME_LOGGED`, `TIME_LOG_DELETED`), comments (`COMMENT_ADDED`), and file attachments (`ATTACHMENT_ADDED`).
+  - **Ergonomic Activity Timeline UI**: Built `ActivityTimeline.tsx` with vertical connecting connector stem, actor avatars, relative timestamps, and diff descriptions showing before-and-after values.
+  - **Dual-Mode Discussion & History Tabs**: Updated `IssueDetailPage.tsx` with seamless tab switching between `Comments (N)` and `Activity History (N)`, invalidating activity queries automatically on user actions.
+- **Verification**: 8 Vitest integration tests in `activity.test.ts` covering authentication (401), not-found (404), forbidden access (403), and activity feed queries. 4 frontend component tests in `ActivityTimeline.test.tsx` and updated `IssueDetailPage.test.tsx`. 91 backend tests and 27 frontend tests passing (118 monorepo tests total). Monorepo typechecks pass cleanly.

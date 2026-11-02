@@ -9,6 +9,7 @@ import { issueService } from '../services/issue.service';
 import { commentService } from '../services/comment.service';
 import { workflowService } from '../services/workflow.service';
 import { timeLogService } from '../services/time-log.service';
+import { activityService } from '../services/activity.service';
 import { IssuePriority, IssueType } from '@flowtrack/shared';
 
 describe('IssueDetailPage Component', () => {
@@ -126,6 +127,18 @@ describe('IssueDetailPage Component', () => {
       ],
       totalMinutes: 120,
     });
+    vi.spyOn(activityService, 'getIssueActivities').mockResolvedValue([
+      {
+        id: 'act-1',
+        issueId: 'issue-1',
+        userId: 'user-1',
+        action: 'STATUS_CHANGED',
+        oldValue: 'To Do',
+        newValue: 'In Progress',
+        createdAt: new Date().toISOString(),
+        user: { id: 'user-1', name: 'Bob Dev' },
+      },
+    ]);
   });
 
   it('renders issue title, description, priority, and existing comments', async () => {
@@ -198,11 +211,36 @@ describe('IssueDetailPage Component', () => {
     const textarea = screen.getByPlaceholderText('Write a comment or update...');
     fireEvent.change(textarea, { target: { value: 'Looks good to merge.' } });
 
-    const submitBtn = screen.getByRole('button', { name: /Comment/i });
+    const submitBtn = screen.getByRole('button', { name: /^Comment$/i });
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
       expect(createCommentSpy).toHaveBeenCalledWith('issue-1', 'Looks good to merge.', []);
+    });
+  });
+
+  it('switches to activity history tab and renders audit timeline entries', async () => {
+    render(
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter initialEntries={['/issues/issue-1']}>
+            <Routes>
+              <Route path="/issues/:id" element={<IssueDetailPage />} />
+            </Routes>
+          </MemoryRouter>
+        </QueryClientProvider>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Activity History/i)).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText(/Activity History/i));
+
+    await waitFor(() => {
+      expect(screen.getByText(/changed status from/i)).toBeInTheDocument();
+      expect(screen.getAllByText('In Progress').length).toBeGreaterThanOrEqual(1);
     });
   });
 });

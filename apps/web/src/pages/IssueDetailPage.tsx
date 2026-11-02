@@ -21,16 +21,20 @@ import {
   Calendar,
   Layers,
   ArrowRight,
+  History,
+  MessageSquare,
 } from 'lucide-react';
 import { issueService } from '../services/issue.service';
 import { commentService } from '../services/comment.service';
 import { attachmentService } from '../services/attachment.service';
 import { workflowService } from '../services/workflow.service';
 import { timeLogService } from '../services/time-log.service';
+import { activityService } from '../services/activity.service';
 import { EditIssueModal } from '../components/issues/EditIssueModal';
 import { CreateIssueModal } from '../components/issues/CreateIssueModal';
 import { LogTimeModal } from '../components/time-logs/LogTimeModal';
 import { TimeLogSection } from '../components/time-logs/TimeLogSection';
+import { ActivityTimeline } from '../components/activities/ActivityTimeline';
 import { useAppSelector } from '../hooks/useRedux';
 import {
   CommentDTO,
@@ -59,6 +63,7 @@ export const IssueDetailPage: React.FC = () => {
   const [isAddSubtaskOpen, setIsAddSubtaskOpen] = useState(false);
   const [isLogTimeOpen, setIsLogTimeOpen] = useState(false);
   const [transitionError, setTransitionError] = useState<string | null>(null);
+  const [activeDiscussionTab, setActiveDiscussionTab] = useState<'comments' | 'history'>('comments');
 
   // Comment input state
   const [newCommentText, setNewCommentText] = useState('');
@@ -104,6 +109,13 @@ export const IssueDetailPage: React.FC = () => {
     enabled: Boolean(id),
   });
 
+  // 6. Fetch chronological activities for this issue
+  const { data: activities = [], isLoading: isActivitiesLoading } = useQuery({
+    queryKey: ['issue-activities', id],
+    queryFn: () => activityService.getIssueActivities(id!),
+    enabled: Boolean(id),
+  });
+
   // Status transition mutation
   const transitionMutation = useMutation({
     mutationFn: (targetStatusId: string) => issueService.transitionIssue(id!, targetStatusId),
@@ -112,6 +124,7 @@ export const IssueDetailPage: React.FC = () => {
       queryClient.setQueryData(['issue-detail', id], updated);
       queryClient.invalidateQueries({ queryKey: ['kanban-issues'] });
       queryClient.invalidateQueries({ queryKey: ['issues-list'] });
+      queryClient.invalidateQueries({ queryKey: ['issue-activities', id] });
     },
     onError: (err: any) => {
       const msg = err.response?.data?.error?.message || err.message || 'Workflow transition failed';
@@ -142,6 +155,7 @@ export const IssueDetailPage: React.FC = () => {
       setCommentFiles([]);
       queryClient.invalidateQueries({ queryKey: ['issue-comments', id] });
       queryClient.invalidateQueries({ queryKey: ['issue-detail', id] });
+      queryClient.invalidateQueries({ queryKey: ['issue-activities', id] });
     } catch (err: any) {
       alert(err.response?.data?.error?.message || err.message || 'Failed to post comment');
     } finally {
@@ -168,6 +182,7 @@ export const IssueDetailPage: React.FC = () => {
       await commentService.deleteComment(commentId);
       queryClient.invalidateQueries({ queryKey: ['issue-comments', id] });
       queryClient.invalidateQueries({ queryKey: ['issue-detail', id] });
+      queryClient.invalidateQueries({ queryKey: ['issue-activities', id] });
     } catch (err: any) {
       alert(err.response?.data?.error?.message || err.message || 'Failed to delete comment');
     }
@@ -391,13 +406,44 @@ export const IssueDetailPage: React.FC = () => {
             )}
           </div>
 
-          {/* Discussion & Comments Thread */}
+          {/* Discussion & Activity History */}
           <div className="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-              Discussion ({comments.length})
-            </h3>
+            {/* Tab Switch: Comments vs Activity Timeline */}
+            <div className="flex items-center space-x-4 border-b border-slate-100 dark:border-slate-800 pb-2">
+              <button
+                type="button"
+                onClick={() => setActiveDiscussionTab('comments')}
+                className={`inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all cursor-pointer ${
+                  activeDiscussionTab === 'comments'
+                    ? 'text-brand-600 dark:text-brand-400 border-brand-600 dark:border-brand-400'
+                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 border-transparent'
+                }`}
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>Comments ({comments.length})</span>
+              </button>
 
-            {/* Comment List */}
+              <button
+                type="button"
+                onClick={() => setActiveDiscussionTab('history')}
+                className={`inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all cursor-pointer ${
+                  activeDiscussionTab === 'history'
+                    ? 'text-brand-600 dark:text-brand-400 border-brand-600 dark:border-brand-400'
+                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 border-transparent'
+                }`}
+              >
+                <History className="w-3.5 h-3.5" />
+                <span>Activity History ({activities.length})</span>
+              </button>
+            </div>
+
+            {/* Tab 1: Activity Timeline */}
+            {activeDiscussionTab === 'history' ? (
+              <ActivityTimeline activities={activities} isLoading={isActivitiesLoading} />
+            ) : (
+              /* Tab 2: Comments & Discussion Feed */
+              <>
+                {/* Comment List */}
             {isCommentsLoading ? (
               <div className="py-8 flex justify-center">
                 <Loader2 className="w-6 h-6 text-brand-600 animate-spin" />
@@ -580,8 +626,10 @@ export const IssueDetailPage: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </>
+        )}
+      </div>
+    </div>
 
         {/* Right Column: Metadata Panels, State Machine Status Transition, Attachments */}
         <div className="space-y-6">
