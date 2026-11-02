@@ -1,4 +1,5 @@
 import { prisma } from '../../shared/prisma';
+import { workflowService } from '../workflows/workflow.service.js';
 import {
   CreateIssueInput,
   UpdateIssueInput,
@@ -509,16 +510,16 @@ export class IssueService {
     }
 
     if (data.statusId && data.statusId !== existing.statusId) {
-      const targetStatus = await prisma.status.findUnique({ where: { id: data.statusId } });
-      if (!targetStatus) {
-        throw new NotFoundError('Target status not found');
-      }
+      const { fromStatusName, toStatusName } = await workflowService.validateTransition(
+        existing.statusId,
+        data.statusId
+      );
       activities.push({
         issueId: id,
         userId: user.id,
         action: 'STATUS_CHANGED',
-        oldValue: existing.status.name,
-        newValue: targetStatus.name,
+        oldValue: fromStatusName,
+        newValue: toStatusName,
       });
     }
 
@@ -586,6 +587,90 @@ export class IssueService {
       assignee: formatUser(updated.assignee),
       reporter: formatUser(updated.reporter)!,
       parent: updated.parent,
+    };
+  }
+
+  /**
+   * Transition an issue's status through the workflow state machine
+   */
+  async transitionIssue(
+    user: { id: string; role: UserRole },
+    id: string,
+    targetStatusId: string
+  ): Promise<IssueDTO> {
+    const existing = await prisma.issue.findUnique({
+      where: { id },
+      include: {
+        status: true,
+        assignee: true,
+      },
+    });
+
+    if (!existing) {
+      throw new NotFoundError('Issue not found');
+    }
+
+    const membership = await this.checkProjectAccess(existing.projectId, user.id, user.role);
+
+    // Permission: Project ADMIN, global ADMIN/MANAGER, reporter, or assignee can transition
+    const isProjectAdmin = membership.role === ProjectMemberRole.ADMIN;
+    const isGlobalPrivileged = user.role === UserRole.ADMIN || user.role === UserRole.MANAGER;
+    const isReporterOrAssignee = existing.reporterId === user.id || existing.assigneeId === user.id;
+
+    if (!isProjectAdmin && !isGlobalPrivileged && !isReporterOrAssignee) {
+      throw new ForbiddenError('You do not have permission to transition this issue');
+    }
+
+    if (existing.statusId === targetStatusId) {
+      return this.getIssueById(user, id);
+    }
+
+    // Validate workflow transition rules (throws 422 UnprocessableEntityError if not permitted)
+    const { fromStatusName, toStatusName } = await workflowService.validateTransition(
+      existing.statusId,
+      targetStatusId
+    );
+
+    // Atomically update status and record activity
+    const [updated] = await prisma.$transaction([
+      prisma.issue.update({
+        where: { id },
+        data: { statusId: targetStatusId },
+        include: {
+          project: true,
+          status: true,
+          assignee: true,
+          reporter: true,
+        },
+      }),
+      prisma.activity.create({
+        data: {
+          issueId: id,
+          userId: user.id,
+          action: 'STATUS_CHANGED',
+          oldValue: fromStatusName,
+          newValue: toStatusName,
+        },
+      }),
+    ]);
+
+    return {
+      id: updated.id,
+      projectId: updated.projectId,
+      parentId: updated.parentId,
+      title: updated.title,
+      description: updated.description,
+      type: updated.type as IssueType,
+      priority: updated.priority as IssuePriority,
+      statusId: updated.statusId,
+      assigneeId: updated.assigneeId,
+      reporterId: updated.reporterId,
+      createdAt: updated.createdAt.toISOString(),
+      updatedAt: updated.updatedAt.toISOString(),
+      project: formatProject(updated.project),
+      status: updated.status,
+      assignee: formatUser(updated.assignee),
+      reporter: formatUser(updated.reporter)!,
     };
   }
 

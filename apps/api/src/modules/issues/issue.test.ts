@@ -294,6 +294,12 @@ describe('Issue Management API Integration Tests', () => {
         name: 'Done',
       } as any);
 
+      vi.spyOn(prisma.workflowTransition, 'findUnique').mockResolvedValue({
+        id: 'trans-1',
+        fromStatusId: 'status-todo-id',
+        toStatusId: '11111111-1111-1111-1111-111111111111',
+      } as any);
+
       vi.spyOn(prisma, '$transaction').mockResolvedValue([
         {
           ...sampleIssue,

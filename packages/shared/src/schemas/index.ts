@@ -146,6 +146,19 @@ export const createTransitionSchema = z.object({
 
 export type CreateTransitionInput = z.infer<typeof createTransitionSchema>;
 
+export const transitionIssueSchema = z.object({
+  statusId: z.string().uuid('Invalid status ID'),
+});
+
+export type TransitionIssueInput = z.infer<typeof transitionIssueSchema>;
+
+export const validateTransitionSchema = z.object({
+  fromStatusId: z.string().uuid('Invalid fromStatusId'),
+  toStatusId: z.string().uuid('Invalid toStatusId'),
+});
+
+export type ValidateTransitionInput = z.infer<typeof validateTransitionSchema>;
+
 // ==========================================
 // Comment & TimeLog Schemas
 // ==========================================

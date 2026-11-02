@@ -104,6 +104,26 @@ export class IssueController {
     }
   }
 
+  async transition(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = req.user!;
+      const { statusId } = req.body;
+      const issue = await issueService.transitionIssue(
+        { id: user.id, role: user.role },
+        req.params.id,
+        statusId
+      );
+
+      res.status(200).json({
+        success: true,
+        data: issue,
+        message: 'Issue status transitioned successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = req.user!;

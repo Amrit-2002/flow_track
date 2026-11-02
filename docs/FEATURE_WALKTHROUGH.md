@@ -180,3 +180,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Task Modal Workflows**: `CreateTaskModal.tsx` and `EditTaskModal.tsx` feature client datalist autocomplete, start/end date validation, 4-stage status pickers, and owner assignments.
   - **Client Management Directory**: `ClientsPage.tsx` provides clean client card layout with inline add, rename, and delete dialogs.
 - **Verification**: Vitest component tests in `TasksPage.test.tsx` and `ClientsPage.test.tsx` verifying 4-stage status badges, client cards, and modal triggers. 14 web tests and 47 backend tests passing (61 total monorepo tests). Vite production build succeeded with 0 errors. Monorepo typecheck passed cleanly.
+
+---
+
+## Milestone 6.1: Workflow Status Transition Validation Engine
+- **Status**: Completed
+- **Summary**: Implemented configurable workflow status transitions with a robust state machine engine enforcing valid issue transitions, preventing illegal status skips, and tracking status change history.
+- **Key Implementation Decisions**:
+  - **Modular Workflow Engine**: Created `modules/workflows/` with `WorkflowService`, `WorkflowController`, and `workflowRouter` exposing `/api/v1/workflows/statuses`, `/api/v1/workflows/transitions`, and `/api/v1/workflows/validate`.
+  - **Strict State Machine Enforcement**: Transitions validate against the `workflow_transitions` relationship matrix. Illegal transitions (e.g. `To Do` directly to `Done` skipping `In Progress`) are rejected with HTTP 422 `INVALID_WORKFLOW_TRANSITION`.
+  - **Atomic Transaction & Audit Logging**: Permitted status changes atomically record an `Activity` audit entry (`action: 'STATUS_CHANGED'`, `oldValue`, `newValue`) in Prisma `$transaction`.
+  - **Fast Quick-Status Transition API**: Added dedicated `PATCH /api/v1/issues/:id/status` (and `POST /api/v1/issues/:id/transition` alias) optimized for agile Kanban drag-and-drop operations with project membership and role checks.
+- **Verification**: 12 Vitest integration tests in `apps/api/src/modules/workflows/workflow.test.ts` testing auth checks (401), membership permissions (403), transition matrix validation, illegal status skip rejection (422), valid status transitions (200), and admin transition creation/deletion. 59 total API tests and 14 Web tests passing (73 total monorepo tests). Monorepo typechecks pass cleanly.
