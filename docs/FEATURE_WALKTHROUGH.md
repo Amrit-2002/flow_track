@@ -168,3 +168,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Context-Aware Modal Dialogs**: `CreateIssueModal` dynamically fetches members of the chosen project for the assignee dropdown, and fetches existing top-level issues in that project so users can seamlessly create subtasks.
   - **Direct CRUD Workflows**: Issues list provides immediate modal triggers for editing titles, priorities, and descriptions, alongside safe deletion with confirmation dialogs.
 - **Verification**: Component test in `IssuesPage.test.tsx` verifying filter toolbar, issue rows, priority badges, and empty states. 9 web tests and 47 backend tests passing (56 total monorepo tests). Vite production build succeeded in 8.08s. Monorepo typecheck passed cleanly with 0 errors.
+
+---
+
+## Milestone 5.4: Frontend Legacy Task Delivery Tracker & Client Directory
+- **Status**: Completed
+- **Summary**: Delivered complete user interfaces for the 4-stage pipeline Task Delivery Tracker and Client Directory, fulfilling 100% parity with Laravel's original delivery workflows.
+- **Key Implementation Decisions**:
+  - **Tabular 4-Stage Matrix View**: `TasksPage.tsx` displays tasks in a clear tabular grid displaying individual progress columns for Development, Unit Testing, Staging, and Production stages with color-coded status badges (`New`, `In-progress`, `Completed`, `On-hold`, `NA`).
+  - **Multi-Filter & Pagination Controls**: Filter by search query, client name, dev status, and priority with automatic page resets and pagination controls.
+  - **Task Modal Workflows**: `CreateTaskModal.tsx` and `EditTaskModal.tsx` feature client datalist autocomplete, start/end date validation, 4-stage status pickers, and owner assignments.
+  - **Client Management Directory**: `ClientsPage.tsx` provides clean client card layout with inline add, rename, and delete dialogs.
+- **Verification**: Vitest component tests in `TasksPage.test.tsx` and `ClientsPage.test.tsx` verifying 4-stage status badges, client cards, and modal triggers. 14 web tests and 47 backend tests passing (61 total monorepo tests). Vite production build succeeded with 0 errors. Monorepo typecheck passed cleanly.
