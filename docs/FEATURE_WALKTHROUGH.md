@@ -146,3 +146,14 @@ This document records the incremental implementation walkthrough for every compl
   - **Transactional Activity Auditing**: Modifications to issue status, title, priority, type, or assignee atomically record historical `Activity` records in Prisma `$transaction`, establishing a permanent audit trail for boards and feeds.
   - **Search & Multi-Filter Query Engine**: Supports concurrent filtering by status, priority, type, assignee, top-level vs subtask parenting (`parentId=null`), and case-insensitive search across title and description with pagination.
 - **Verification**: 11 Vitest integration tests in `apps/api/src/modules/issues/issue.test.ts` covering CRUD operations, project membership enforcement (403), cross-project subtask rejections (400), self-parenting prevention (400), and unauthorized deletion rejections (403). Total 35 backend tests passing. Monorepo typecheck passed cleanly with 0 errors.
+
+---
+
+## Milestone 5.2: Backend Legacy Task Tracker & Client Management API
+- **Status**: Completed
+- **Summary**: Implemented the legacy Task and Client modules preserving the original Laravel functionality (`TaskController` and `ClientController`), providing a specialized 4-stage pipeline for tasks with client associations.
+- **Key Implementation Decisions**:
+  - **Ownership Scoping & Soft Deletions**: Regular users access and manage their own clients and tasks, while administrators have system-wide visibility. Deletions apply `deletedAt: new Date()` to protect historical integrity.
+  - **4-Stage Pipeline Tracking**: Preserves individual tracking across Development, Unit Testing, Staging, and Production stages (`New`, `In-progress`, `Completed`, `On-hold`, `NA`).
+  - **Date Validation**: Enforces `startDate <= endDate` at both the Zod validation layer and service layer.
+- **Verification**: 12 Vitest integration tests (6 in `apps/api/src/modules/clients/client.test.ts` and 6 in `apps/api/src/modules/tasks/task.test.ts`) covering CRUD, ownership isolation, date validation, and soft deletions. Total 47 backend tests passing. Monorepo typecheck passed with 0 errors.
