@@ -192,3 +192,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Atomic Transaction & Audit Logging**: Permitted status changes atomically record an `Activity` audit entry (`action: 'STATUS_CHANGED'`, `oldValue`, `newValue`) in Prisma `$transaction`.
   - **Fast Quick-Status Transition API**: Added dedicated `PATCH /api/v1/issues/:id/status` (and `POST /api/v1/issues/:id/transition` alias) optimized for agile Kanban drag-and-drop operations with project membership and role checks.
 - **Verification**: 12 Vitest integration tests in `apps/api/src/modules/workflows/workflow.test.ts` testing auth checks (401), membership permissions (403), transition matrix validation, illegal status skip rejection (422), valid status transitions (200), and admin transition creation/deletion. 59 total API tests and 14 Web tests passing (73 total monorepo tests). Monorepo typechecks pass cleanly.
+
+---
+
+## Milestone 6.2: Issue Comment Discussions & File Attachment Storage
+- **Status**: Completed
+- **Summary**: Implemented rich issue discussion threads, automated in-app notification dispatching, and secure multipart file upload storage.
+- **Key Implementation Decisions**:
+  - **Modular Comment Architecture**: Created `modules/comments/` with `CommentService`, `CommentController`, and `commentRouter` managing comment threads with author profiles and attached files.
+  - **Multipart Storage Abstraction**: Built `StorageService` using Multer for processing file uploads with 10MB limits, dangerous extension protection, local disk streaming via `express.static('/uploads')`, and dedicated download streams (`GET /api/v1/attachments/:id/download`).
+  - **In-App Notification Dispatch**: Adding a comment atomically generates in-app `Notification` records for issue assignees and reporters (excluding the comment author) alongside transactional `Activity` auditing (`COMMENT_ADDED`).
+  - **Granular Ownership & Cascade Deletion**: Enforces strict author/admin permissions on comment edits and deletions, cleaning up physical storage files on disk when attachments or comments are removed.
+- **Verification**: 13 Vitest integration tests in `apps/api/src/modules/comments/comment.test.ts` verifying authentication (401), project authorization (403), notification triggers, author edit/delete guards, and attachment upload/download/deletion flows. 72 total API tests and 14 Web tests passing (86 total monorepo tests). Monorepo typechecks pass cleanly.

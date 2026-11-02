@@ -48,6 +48,8 @@ Thumbs.db
 # Database & Local Cache
 *.sqlite
 *.sqlite3
+uploads/
+!apps/api/uploads/.gitkeep
 *.sqlite-journal
 *.db
 prisma/*.db

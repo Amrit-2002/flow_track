@@ -1,3 +1,4 @@
+import path from 'path';
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -15,6 +16,8 @@ import { issueRouter } from './modules/issues/issue.routes';
 import { clientRouter } from './modules/clients/client.routes';
 import { taskRouter } from './modules/tasks/task.routes';
 import { workflowRouter } from './modules/workflows/workflow.routes';
+import { commentRouter } from './modules/comments/comment.routes';
+import { attachmentRouter } from './modules/attachments/attachment.routes';
 import { prisma } from './shared/prisma';
 import { requireAuth } from './middleware/auth';
 
@@ -88,6 +91,11 @@ export function createApp(): Express {
   app.use('/api/v1/clients', clientRouter);
   app.use('/api/v1/tasks', taskRouter);
   app.use('/api/v1/workflows', workflowRouter);
+  app.use('/api/v1/comments', commentRouter);
+  app.use('/api/v1/attachments', attachmentRouter);
+
+  // Serve static uploaded files
+  app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 
   // Workflow Statuses endpoint (backward compatibility alias)
   app.get('/api/v1/statuses', requireAuth, async (_req: Request, res: Response, next) => {

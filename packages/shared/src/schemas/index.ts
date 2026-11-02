@@ -169,6 +169,12 @@ export const createCommentSchema = z.object({
 
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 
+export const updateCommentSchema = z.object({
+  content: z.string().trim().min(1, 'Comment cannot be empty').max(5000),
+});
+
+export type UpdateCommentInput = z.infer<typeof updateCommentSchema>;
+
 export const createTimeLogSchema = z.object({
   timeSpent: z.number().int().min(1, 'Time spent must be at least 1 minute'),
   description: z.string().trim().max(500).optional().nullable(),
