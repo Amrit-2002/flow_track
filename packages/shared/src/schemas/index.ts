@@ -185,6 +185,12 @@ export const createClientSchema = z.object({
 
 export type CreateClientInput = z.infer<typeof createClientSchema>;
 
+export const updateClientSchema = z.object({
+  name: z.string().trim().min(1, 'Client name is required').max(200),
+});
+
+export type UpdateClientInput = z.infer<typeof updateClientSchema>;
+
 export const createTaskSchema = z.object({
   client: z.string().trim().min(1, 'Client is required').max(200),
   taskBugName: z.string().trim().min(1, 'Task/Bug name is required').max(255),
@@ -203,4 +209,20 @@ export const createTaskSchema = z.object({
 });
 
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
+
+export const updateTaskSchema = z.object({
+  client: z.string().trim().min(1).max(200).optional(),
+  taskBugName: z.string().trim().min(1).max(255).optional(),
+  owner: z.string().trim().min(1).max(255).optional(),
+  priority: z.enum(['Low', 'Medium', 'High']).optional(),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  devStatus: z.nativeEnum(TaskDevStatus).optional(),
+  unitTestStatus: z.nativeEnum(TaskDevStatus).optional(),
+  stagingStatus: z.nativeEnum(TaskDevStatus).optional(),
+  prodStatus: z.nativeEnum(TaskDevStatus).optional(),
+  comment: z.string().trim().max(2000).optional().nullable(),
+});
+
+export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 

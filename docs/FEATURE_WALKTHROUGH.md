@@ -134,3 +134,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Actionable Bottleneck Detection**: Automatically renders an amber attention banner when a non-terminal status holds disproportionate backlog volume, providing teams with direct visibility into throughput friction.
   - **Audit Timeline & Workload Leaderboard**: Displays top assignees with percentage progress bars and real-time activity changes with actor names and timestamps.
 - **Verification**: Component test in `DashboardPage.test.tsx` verifying KPI metrics, bottleneck banner, project selector, and Recharts container rendering. Total 7 web tests and 24 API tests passing. TypeScript typecheck passed cleanly across all workspaces.
+
+---
+
+## Milestone 5.1: Backend Issue Management & Subtask Hierarchy Engine
+- **Status**: Completed
+- **Summary**: Implemented the central issue tracker module, supporting story/task/bug workflows, hierarchical parent-child subtask relationships, multi-criteria filtering, full-text search, and automated activity audit logging.
+- **Key Implementation Decisions**:
+  - **Granular Scoping & Tenant Security**: Standard `USER` accounts can only query and manipulate issues belonging to projects where they hold active membership.
+  - **Relational Subtask Integrity**: Validates that child subtasks belong to the exact same `projectId` as their parent issue, preventing cross-tenant project leakage, and prevents circular parenting (`parentId !== id`).
+  - **Transactional Activity Auditing**: Modifications to issue status, title, priority, type, or assignee atomically record historical `Activity` records in Prisma `$transaction`, establishing a permanent audit trail for boards and feeds.
+  - **Search & Multi-Filter Query Engine**: Supports concurrent filtering by status, priority, type, assignee, top-level vs subtask parenting (`parentId=null`), and case-insensitive search across title and description with pagination.
+- **Verification**: 11 Vitest integration tests in `apps/api/src/modules/issues/issue.test.ts` covering CRUD operations, project membership enforcement (403), cross-project subtask rejections (400), self-parenting prevention (400), and unauthorized deletion rejections (403). Total 35 backend tests passing. Monorepo typecheck passed cleanly with 0 errors.

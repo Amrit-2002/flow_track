@@ -11,6 +11,7 @@ import { authRouter } from './modules/auth/auth.routes';
 import { userRouter } from './modules/users/user.routes';
 import { projectRouter } from './modules/projects/project.routes';
 import { dashboardRouter } from './modules/dashboard/dashboard.routes';
+import { issueRouter } from './modules/issues/issue.routes';
 
 export function createApp(): Express {
   const app = express();
@@ -78,6 +79,7 @@ export function createApp(): Express {
   app.use('/api/v1/users', userRouter);
   app.use('/api/v1/projects', projectRouter);
   app.use('/api/v1/dashboard', dashboardRouter);
+  app.use('/api/v1/issues', issueRouter);
 
   // 404 handler for undefined routes
   app.use(notFoundHandler);
