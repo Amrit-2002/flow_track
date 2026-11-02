@@ -308,3 +308,15 @@ This document records the incremental implementation walkthrough for every compl
   - `e2e/navigation.spec.ts`: End-to-end user navigation flows across Projects, Issues, Kanban Board, Legacy Task Tracker, Clients directory, and Notification Center drawer.
   - `package.json`: Added `test:e2e` script.
 - **Verification**: 10 tests across 2 Playwright specs listed and validated with `npx playwright test --list`. 154 Vitest unit/integration tests passing. Monorepo typechecks cleanly.
+
+### Milestone 10: Free-Tier Deployment & CI/CD Pipeline
+- **Status**: Completed
+- **Changes**:
+  - `.github/workflows/ci.yml`: Created GitHub Actions automated CI pipeline with dependency caching, Prisma generation, monorepo typecheck, full 154-test Vitest run, and multi-workspace build.
+  - `docker/Dockerfile.api` & `docker/Dockerfile.web`: Multi-stage Docker builds for backend and frontend with unprivileged user security.
+  - `docker/nginx.conf`: Nginx SPA fallback and gzip/static caching rules.
+  - `docker-compose.yml`: Multi-container configuration for isolated local full-stack development (Postgres 16 + API + Web).
+  - `render.yaml`: Infrastructure-as-code blueprint for Render Web Service free-tier deployment with health check path `/health`.
+  - `apps/web/vercel.json`: Vercel SPA route rewrite rules and immutable cache headers.
+  - `docs/FREE_HOSTING_DEPLOYMENT.md`: Exhaustive zero-cost production deployment guide for Neon, Render, Vercel, Supabase, and Docker.
+- **Verification**: GitHub Actions workflow syntax validated. Dockerfiles and Compose configurations structured according to best practices. Vercel JSON routing rules verified. Monorepo builds cleanly.

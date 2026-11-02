@@ -114,3 +114,18 @@ This log tracks every Git commit made throughout the incremental development of 
 - **Commit**: `test(e2e): configure Playwright end-to-end test suite for core workflows`
 - **Scope**: `playwright.config.ts`, `e2e/auth.spec.ts`, `e2e/navigation.spec.ts`, `package.json`
 - **Details**: Configured Playwright E2E automation framework with multi-server orchestration (`npm run dev:api` on 5000 and `npm run dev:web` on 5173). Implemented automated test suites in `e2e/auth.spec.ts` and `e2e/navigation.spec.ts` testing authentication redirects, quick demo logins, theme mode toggling, logout session clearance, and cross-platform navigation across Projects, Issues, Kanban, Tasks, Clients, and the Notification Bell drawer (10 tests in 2 suites). Added `npm run test:e2e` npm script.
+
+### 28. Milestone 10.1: CI Pipeline Automation
+- **Commit**: `ci: add GitHub Actions workflow for typecheck, lint, and test verification`
+- **Scope**: `.github/workflows/ci.yml`
+- **Details**: Established GitHub Actions continuous integration pipeline running on Ubuntu with Node.js 20.x. Automated monorepo dependency caching, Prisma client generation, TypeScript typechecks across all workspaces, complete Vitest unit/integration test suites (154 tests), and production bundling.
+
+### 29. Milestone 10.2: Containerization & Cloud Deployment Manifests
+- **Commit**: `deploy: add Dockerfiles, render.yaml, and vercel.json for free-tier hosting`
+- **Scope**: `docker/Dockerfile.api`, `docker/Dockerfile.web`, `docker/nginx.conf`, `docker-compose.yml`, `render.yaml`, `apps/web/vercel.json`
+- **Details**: Configured production multi-stage Docker builds for Node.js Express backend and Nginx-backed React SPA. Created root `docker-compose.yml` for local multi-container development. Added `render.yaml` blueprint for zero-config Render free web service deployment with health checks. Configured `apps/web/vercel.json` with SPA catch-all rewrites and immutable asset caching for Vercel Hobby tier.
+
+### 30. Milestone 10.3: Free-Tier Hosting Deployment Guide
+- **Commit**: `docs: add comprehensive free-tier hosting deployment guide`
+- **Scope**: `docs/FREE_HOSTING_DEPLOYMENT.md`
+- **Details**: Authored complete step-by-step production deployment documentation covering Neon/Supabase PostgreSQL connection pooling setup, Render Web Service configuration, Vercel SPA deployment, cold start mitigation strategies via free pingers, cross-origin CORS/cookie configuration, and local Docker Compose deployment instructions.

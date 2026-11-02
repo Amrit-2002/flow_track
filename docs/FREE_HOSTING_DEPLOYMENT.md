@@ -1,108 +1,191 @@
-# FlowTrack — Free-Tier Deployment & Infrastructure Guide
+# FlowTrack — Complete Free-Tier Deployment & Hosting Guide
 
-This guide details the complete deployment architecture, environment configurations, and deployment procedures for running FlowTrack on 100% free hosting tiers without requiring paid infrastructure.
+This guide provides end-to-end instructions for deploying the entire FlowTrack monorepo to production using **100% free hosting tiers**. No paid subscriptions or credit cards are required.
 
 ---
 
-## 1. Free-Tier Infrastructure Architecture
+## 1. Zero-Cost Architecture Overview
 
-```mermaid
-graph LR
-    User["End User Browser"]
-    Vercel["Vercel Hobby Tier<br/>(React SPA Static Host)"]
-    Render["Render Free Web Service<br/>(Express API + WebSockets)"]
-    Neon["Neon / Supabase Free Tier<br/>(PostgreSQL Database)"]
-    SupaStore["Supabase Storage Free Tier<br/>(1GB S3-Compatible File Bucket)"]
-
-    User -->|"HTTPS (Static Assets)"| Vercel
-    User -->|"REST API Requests (HTTPS with Credentials)"| Render
-    User <-->|"Socket.IO Events (WSS with Auth)"| Render
-    Render -->|"Connection Pooling / Prisma"| Neon
-    Render -->|"Upload / Download Streams"| SupaStore
+```
+ ┌─────────────────────────────────────────────────────────────┐
+ │                       Vercel (Hobby)                        │
+ │  React 18 + Vite SPA · Tailwind CSS · Global Edge CDN       │
+ │  URL: https://flowtrack-web.vercel.app                      │
+ └──────────────┬──────────────────────────────▲───────────────┘
+                │                              │
+       HTTPS REST API Calls           Real-Time Socket.IO
+      (Bearer JWT in Header)         (WebSocket / Polling)
+                │                              │
+ ┌──────────────▼──────────────────────────────┴───────────────┐
+ │                     Render Web Service                      │
+ │  Express.js API · Node.js 20 · Socket.IO Server             │
+ │  URL: https://flowtrack-api.onrender.com                    │
+ └──────────────┬──────────────────────────────┬───────────────┘
+                │                              │
+       Prisma Query Engine           Object Storage (Uploads)
+    (PgBouncer Pooled Conn)                    │
+ ┌──────────────▼──────────────┐ ┌─────────────▼───────────────┐
+ │   Neon / Supabase Postgres  │ │   Supabase Object Storage   │
+ │   Free 500MB DB · PG 16     │ │   Free 1GB S3-Compatible    │
+ └─────────────────────────────┘ └─────────────────────────────┘
 ```
 
----
-
-## 2. Platform Breakdown & Free Tier Limits
-
-| Component | Provider | Tier & Constraints | Mitigation Strategy |
-|---|---|---|---|
-| **Frontend** | Vercel | Hobby Tier: Unlimited bandwidth, global CDN, SPA rewrites. | Built as pure Vite static output (`dist/`). |
-| **Backend** | Render | Free Web Service: 512 MB RAM, spins down after 15 min of inactivity. Cold starts take ~30-50s. Ephemeral disk. | Health check endpoint `/health`, in-memory caches avoid heavy startup, external storage used for all file uploads. |
-| **Database** | Neon or Supabase | Free PostgreSQL: 500 MB storage, connection pooling. | Prisma configured with `DATABASE_URL` (pooled) and `DIRECT_URL` (direct migrations). Indexes applied to prevent full-table scans. |
-| **File Storage** | Supabase Storage | 1 GB Free S3-compatible bucket, 50MB per-file upload limit. | Files uploaded via backend stream with size validation (max 10MB per file). |
+| Component | Free-Tier Provider | Free Limit Details |
+| :--- | :--- | :--- |
+| **Frontend** | [Vercel](https://vercel.com) | Unlimited deployments, 100GB bandwidth/month, Global Edge Network |
+| **Backend** | [Render](https://render.com) | 750 free instance hours/month, automatic SSL, WebSockets enabled |
+| **Database** | [Neon](https://neon.tech) / [Supabase](https://supabase.com) | 0.5 GB Postgres 16 storage, built-in connection pooling |
+| **Attachments** | Supabase Storage / Render disk | 1GB free object storage with public URLs |
+| **CI/CD** | [GitHub Actions](https://github.com/features/actions) | 2,000 free runner minutes/month |
 
 ---
 
-## 3. Environment Variable Matrix
+## 2. Step 1: Database Provisioning (Neon / Supabase)
 
-### Backend (`apps/api/.env`)
-```ini
-NODE_ENV=production
-PORT=10000
-DATABASE_URL="postgresql://user:pass@ep-pooler.neon.tech/flowtrack?sslmode=require&pgbouncer=true"
-DIRECT_URL="postgresql://user:pass@ep.neon.tech/flowtrack?sslmode=require"
-JWT_SECRET="replace-with-a-secure-random-64-character-string"
-JWT_EXPIRES_IN="15m"
-REFRESH_TOKEN_EXPIRES_IN="7d"
-CORS_ORIGIN="https://flowtrack.vercel.app"
-CLIENT_URL="https://flowtrack.vercel.app"
+### Option A: Neon Serverless Postgres (Recommended)
+1. Sign up for free at [neon.tech](https://neon.tech).
+2. Create a project named `flowtrack-prod` and select your nearest region.
+3. In the Neon Console Dashboard, copy your connection string with **Connection Pooling enabled**:
+   ```
+   postgresql://flowtrack_user:password@ep-cool-fog-123456-pooler.us-east-2.aws.neon.tech/flowtrack?sslmode=require&pgbouncer=true
+   ```
+4. Also copy the direct connection string (without `-pooler`) for Prisma migrations:
+   ```
+   postgresql://flowtrack_user:password@ep-cool-fog-123456.us-east-2.aws.neon.tech/flowtrack?sslmode=require
+   ```
 
-# Supabase Storage / S3 Configuration
-STORAGE_PROVIDER="supabase"
-SUPABASE_URL="https://your-project.supabase.co"
-SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
-SUPABASE_BUCKET="flowtrack-attachments"
-```
+### Option B: Supabase Postgres
+1. Sign up at [supabase.com](https://supabase.com) and click **New Project**.
+2. Set database password and select your preferred region.
+3. In **Project Settings** > **Database**, locate the **Connection string** (URI mode, Transaction pooler on port 6543).
 
-### Frontend (`apps/web/.env`)
-```ini
-VITE_API_BASE_URL="https://flowtrack-api.onrender.com/api/v1"
-VITE_SOCKET_URL="https://flowtrack-api.onrender.com"
-```
-
----
-
-## 4. Step-by-Step Deployment Instructions
-
-### Step 1: Set Up Managed PostgreSQL Database (Neon or Supabase)
-1. Sign up for [Neon.tech](https://neon.tech) or [Supabase](https://supabase.com).
-2. Create a new project called `flowtrack`.
-3. Copy the **Connection Pooling** connection string as `DATABASE_URL`.
-4. Copy the **Direct** connection string as `DIRECT_URL`.
-
-### Step 2: Run Prisma Migrations & Seed
-Run migrations against the remote database from your local machine:
+### Run Migrations & Seed Production Database
+From your local terminal, apply schema migrations and populate initial seed data:
 ```bash
-DATABASE_URL="<remote-pooled-url>" DIRECT_URL="<remote-direct-url>" npx prisma migrate deploy
-DATABASE_URL="<remote-pooled-url>" npx prisma db seed
+# Set your production database URL temporarily
+export DATABASE_URL="your-production-database-url"
+
+# Deploy Prisma migrations
+npm run db:migrate
+
+# Seed standard users (Admin, Manager, User), workflow statuses, and demo tickets
+npm run db:seed
 ```
 
-### Step 3: Configure Object Storage Bucket (Supabase Storage)
-1. In Supabase Dashboard, navigate to **Storage** -> **Create new bucket**.
-2. Name the bucket `flowtrack-attachments`.
-3. Set public access or configure bucket policies for download URLs.
+---
 
-### Step 4: Deploy Express Backend to Render
-1. Sign up on [Render.com](https://render.com).
-2. Click **New +** -> **Web Service**.
-3. Connect your GitHub repository.
-4. Set:
-   - **Root Directory**: `apps/api` (or monorepo root with build command)
-   - **Build Command**: `npm install && npm run build --workspace=@flowtrack/shared && npm run build --workspace=@flowtrack/api`
-   - **Start Command**: `npm run start --workspace=@flowtrack/api`
-5. Under **Environment Variables**, add all backend variables listed above.
-6. Verify deployment by visiting `https://<your-render-subdomain>.onrender.com/health`.
+## 3. Step 2: Backend Deployment on Render
 
-### Step 5: Deploy React Frontend to Vercel
-1. Sign up on [Vercel.com](https://vercel.com).
-2. Click **Add New** -> **Project** and select your GitHub repository.
-3. Configure:
-   - **Root Directory**: `apps/web`
+### Method A: Deploy using Render Blueprint (`render.yaml`)
+1. Fork or push the FlowTrack monorepo to your GitHub account.
+2. Sign in to [Render](https://dashboard.render.com).
+3. Click **New** > **Blueprint**.
+4. Connect your GitHub repository. Render automatically reads `render.yaml` from the root.
+5. In the Blueprint configuration:
+   - Provide your `DATABASE_URL` (from Neon or Supabase).
+   - Set `CORS_ORIGIN` to your Vercel URL (e.g. `https://flowtrack-web.vercel.app`).
+6. Click **Apply**. Render will trigger the build and deploy.
+
+### Method B: Manual Web Service Setup on Render
+1. Click **New +** > **Web Service**.
+2. Select your repository.
+3. Configure the service settings:
+   - **Name**: `flowtrack-api`
+   - **Language**: `Node`
+   - **Branch**: `master` (or `main`)
+   - **Region**: Same region as your database (e.g. Oregon / Ohio)
+   - **Build Command**:
+     ```bash
+     npm ci && npm run build:shared && npm run db:generate && npm run build:api
+     ```
+   - **Start Command**:
+     ```bash
+     node apps/api/dist/server.js
+     ```
+   - **Plan Type**: `Free`
+4. Add the following **Environment Variables**:
+
+| Variable | Recommended Production Value | Note |
+| :--- | :--- | :--- |
+| `NODE_ENV` | `production` | Enables production optimizations |
+| `PORT` | `5000` | Render binds traffic automatically |
+| `DATABASE_URL` | `postgresql://...` | Your pooled PostgreSQL connection URL |
+| `CORS_ORIGIN` | `https://flowtrack-web.vercel.app` | Frontend production origin |
+| `JWT_ACCESS_SECRET` | *(64-char random string)* | Used to sign short-lived access tokens |
+| `JWT_REFRESH_SECRET`| *(64-char random string)* | Used to sign refresh tokens |
+| `ACCESS_TOKEN_EXPIRES_IN` | `15m` | Access token lifespan |
+| `REFRESH_TOKEN_EXPIRES_IN` | `7d` | Refresh token lifespan |
+
+5. Under **Advanced**, set **Health Check Path** to `/health`.
+6. Click **Create Web Service**.
+
+> [!NOTE] Handling Render Free Tier Sleep (Cold Starts)
+> Free Render instances spin down after 15 minutes of inactivity. The first request after sleep takes 30-50 seconds to wake up.
+> **Zero-Cost Mitigation**: Set up a free HTTP ping on [Cron-job.org](https://cron-job.org) or [UptimeRobot](https://uptimerobot.com) targeting `https://flowtrack-api.onrender.com/health` every 10 minutes to keep the instance warm 24/7.
+
+---
+
+## 4. Step 3: Frontend Deployment on Vercel
+
+1. Sign in to [Vercel](https://vercel.com) using your GitHub account.
+2. Click **Add New...** > **Project** and select your `flowtrack` repository.
+3. Configure the project:
    - **Framework Preset**: `Vite`
-   - **Build Command**: `npm run build`
+   - **Root Directory**: Click Edit and select `apps/web`
+   - **Build Command**: `npm run build:shared && npm run build` (or override with `npm run build`)
    - **Output Directory**: `dist`
-4. Under **Environment Variables**, set:
-   - `VITE_API_BASE_URL`: `https://<your-render-subdomain>.onrender.com/api/v1`
-   - `VITE_SOCKET_URL`: `https://<your-render-subdomain>.onrender.com`
-5. Deploy and verify SPA routing (`/dashboard`, `/projects`, `/issues`).
+   - **Install Command**: `npm install`
+4. Expand **Environment Variables** and add:
+
+| Variable | Value | Description |
+| :--- | :--- | :--- |
+| `VITE_API_URL` | `https://flowtrack-api.onrender.com/api/v1` | Backend REST API endpoint |
+| `VITE_WS_URL` | `https://flowtrack-api.onrender.com` | Backend WebSocket base URL |
+
+5. Click **Deploy**. Vercel compiles the Vite project and generates a live edge URL (e.g. `https://flowtrack-web.vercel.app`).
+6. Copy your Vercel URL and update `CORS_ORIGIN` in Render to match.
+
+---
+
+## 5. Step 4: Verification & Smoke Test Checklist
+
+Once both services are running:
+1. **Health Check**: Open `https://flowtrack-api.onrender.com/health` in your browser. Expect `{"status":"ok","service":"flowtrack-api"}`.
+2. **REST Probe**: Open `https://flowtrack-api.onrender.com/api/v1`. Expect `{"success":true,"message":"FlowTrack REST API v1 is operational"}`.
+3. **Login Journey**:
+   - Open your Vercel app.
+   - Click "Sign in as Admin (System Administrator)".
+   - Verify instant redirect to `/dashboard` with aggregated statistics.
+4. **WebSocket Test**:
+   - Open the app in two separate browser tabs or windows.
+   - Navigate to `/kanban` on both.
+   - Drag or move an issue card on Tab 1.
+   - Verify the card moves instantly on Tab 2 via real-time WebSocket broadcast without refreshing.
+5. **In-App Notification Test**:
+   - In Tab 1, post a comment on an issue assigned to Developer.
+   - In Tab 2 (logged in as Developer), observe the Notification Bell badge display `1 new` with real-time audio/visual alert.
+
+---
+
+## 6. Local Multi-Container Deployment via Docker Compose
+
+To test the entire production stack locally in isolated Docker containers:
+
+```bash
+# 1. Start Postgres, Express API, and Nginx Web in background
+docker-compose up --build -d
+
+# 2. Check container health status
+docker-compose ps
+
+# 3. View streaming logs
+docker-compose logs -f api
+
+# 4. Access local applications:
+#    Frontend: http://localhost:3000
+#    Backend:  http://localhost:5000/api/v1
+#    Health:   http://localhost:5000/health
+
+# 5. Stop containers and preserve database volume:
+docker-compose down
+```
