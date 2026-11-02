@@ -19,6 +19,7 @@ import { workflowRouter } from './modules/workflows/workflow.routes';
 import { commentRouter } from './modules/comments/comment.routes';
 import { attachmentRouter } from './modules/attachments/attachment.routes';
 import { timeLogRouter } from './modules/time-logs/time-log.routes';
+import { savedFilterRouter } from './modules/saved-filters/saved-filter.routes';
 import { prisma } from './shared/prisma';
 import { requireAuth } from './middleware/auth';
 
@@ -95,6 +96,7 @@ export function createApp(): Express {
   app.use('/api/v1/comments', commentRouter);
   app.use('/api/v1/attachments', attachmentRouter);
   app.use('/api/v1/time-logs', timeLogRouter);
+  app.use('/api/v1/saved-filters', savedFilterRouter);
 
   // Serve static uploaded files
   app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));

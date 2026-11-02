@@ -19,6 +19,7 @@ import { projectService } from '../services/project.service';
 import { statusService } from '../services/status.service';
 import { CreateIssueModal } from '../components/issues/CreateIssueModal';
 import { EditIssueModal } from '../components/issues/EditIssueModal';
+import { SavedFiltersBar } from '../components/issues/SavedFiltersBar';
 import { IssueDTO, IssuePriority, IssueType } from '@flowtrack/shared';
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
@@ -40,6 +41,7 @@ export const IssuesPage: React.FC = () => {
   const [statusId, setStatusId] = useState<string>('');
   const [priority, setPriority] = useState<string>('');
   const [type, setType] = useState<string>('');
+  const [activeFilterId, setActiveFilterId] = useState<string | null>(null);
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingIssue, setEditingIssue] = useState<IssueDTO | null>(null);
@@ -115,8 +117,23 @@ export const IssuesPage: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+      <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        {/* Saved Filter Views Toolbar */}
+        <SavedFiltersBar
+          currentFilters={{ search, projectId, statusId, priority, type }}
+          activeFilterId={activeFilterId}
+          onSelectFilterId={setActiveFilterId}
+          onApplyFilter={(filters) => {
+            setSearch(filters.search || '');
+            setProjectId(filters.projectId || '');
+            setStatusId(filters.statusId || '');
+            setPriority(filters.priority || '');
+            setType(filters.type || '');
+            setPage(1);
+          }}
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
           {/* Keyword Search */}
           <div className="relative lg:col-span-2">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />

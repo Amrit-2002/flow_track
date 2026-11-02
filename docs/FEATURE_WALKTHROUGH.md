@@ -253,3 +253,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Ergonomic Activity Timeline UI**: Built `ActivityTimeline.tsx` with vertical connecting connector stem, actor avatars, relative timestamps, and diff descriptions showing before-and-after values.
   - **Dual-Mode Discussion & History Tabs**: Updated `IssueDetailPage.tsx` with seamless tab switching between `Comments (N)` and `Activity History (N)`, invalidating activity queries automatically on user actions.
 - **Verification**: 8 Vitest integration tests in `activity.test.ts` covering authentication (401), not-found (404), forbidden access (403), and activity feed queries. 4 frontend component tests in `ActivityTimeline.test.tsx` and updated `IssueDetailPage.test.tsx`. 91 backend tests and 27 frontend tests passing (118 monorepo tests total). Monorepo typechecks pass cleanly.
+
+---
+
+## Milestone 7.3: Saved Filters for Custom Issue Views
+- **Status**: Completed
+- **Summary**: Delivered user-scoped saved filter management allowing team members to store, manage, and toggle custom issue view presets with single-click execution.
+- **Key Implementation Decisions**:
+  - **User-Scoped Saved Filters API**: Built `modules/saved-filters/` with `SavedFilterService`, `SavedFilterController`, and `savedFilterRouter` providing `GET /api/v1/saved-filters`, `POST /api/v1/saved-filters`, and `DELETE /api/v1/saved-filters/:id`.
+  - **Dynamic JSON Filter Storage**: Filter configurations (search query, projectId, statusId, priority, type) are stored as structured JSON in PostgreSQL, ensuring full forward and backward query compatibility.
+  - **Saved Filters Bar Component**: Created `SavedFiltersBar.tsx` featuring preset chips with active state highlighting, inline "+ Save View" name prompt, and direct deletion controls with automatic TanStack Query cache invalidation.
+  - **Backlog Page Integration**: Integrated `SavedFiltersBar` seamlessly into the top of the filter panel on `IssuesPage.tsx`, allowing team members to switch between custom filtered views (e.g., "Critical Bugs", "Backend Tasks") instantly.
+- **Verification**: 8 Vitest integration tests in `saved-filter.test.ts` covering authentication (401), validation (400), not-found (404), non-owner forbidden access (403), and admin deletion powers. 4 frontend tests in `SavedFiltersBar.test.tsx` and updated `IssuesPage.test.tsx`. 99 backend tests and 31 frontend tests passing (130 monorepo tests total). Monorepo typechecks and Vite build succeed cleanly.
