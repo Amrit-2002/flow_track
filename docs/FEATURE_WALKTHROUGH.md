@@ -299,3 +299,12 @@ This document records the incremental implementation walkthrough for every compl
   - `apps/api/src/modules/notifications/notification.test.ts`: Added 6 Vitest backend integration tests.
   - `apps/web/src/components/notifications/NotificationBell.test.tsx`: Added 4 Vitest frontend unit tests.
 - **Verification**: 111 backend tests across 14 suites, 43 frontend tests across 14 suites (154 monorepo tests total, all passing). Monorepo typecheck 0 errors. Vite production build succeeds.
+
+### Milestone 9: Playwright End-to-End Test Suite
+- **Status**: Completed
+- **Changes**:
+  - `playwright.config.ts`: Configured Playwright with multi-server webServer orchestration (`npm run dev:api` on port 5000 and `npm run dev:web` on port 5173).
+  - `e2e/auth.spec.ts`: End-to-end tests for landing page, quick demo authentication, role redirection, theme toggling, and session invalidation upon sign-out.
+  - `e2e/navigation.spec.ts`: End-to-end user navigation flows across Projects, Issues, Kanban Board, Legacy Task Tracker, Clients directory, and Notification Center drawer.
+  - `package.json`: Added `test:e2e` script.
+- **Verification**: 10 tests across 2 Playwright specs listed and validated with `npx playwright test --list`. 154 Vitest unit/integration tests passing. Monorepo typechecks cleanly.
