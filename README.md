@@ -1,6 +1,6 @@
 # FlowTrack — Full-Stack Project & Issue Management Platform
 
-[![CI Pipeline](https://github.com/Amrit-2002/FlowTrack/actions/workflows/ci.yml/badge.svg)](https://github.com/Amrit-2002/FlowTrack/actions/workflows/ci.yml)
+[![CI Pipeline](https://github.com/Amrit-2002/flow_track/actions/workflows/ci.yml/badge.svg)](https://github.com/Amrit-2002/flow_track/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://react.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js)](https://nodejs.org/)
@@ -104,7 +104,7 @@ flowtrack/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/Amrit-2002/FlowTrack.git
+git clone https://github.com/Amrit-2002/flow_track.git
 cd flowtrack
 ```
 
