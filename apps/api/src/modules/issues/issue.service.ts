@@ -254,6 +254,9 @@ export class IssueService {
           },
           orderBy: { createdAt: 'asc' },
         },
+        attachments: {
+          orderBy: { createdAt: 'desc' },
+        },
         _count: {
           select: {
             comments: true,
@@ -289,7 +292,17 @@ export class IssueService {
       assignee: formatUser(issue.assignee),
       reporter: formatUser(issue.reporter)!,
       parent: issue.parent,
-      children: issue.children.map((c) => ({
+      attachments: (issue.attachments || []).map((a: any) => ({
+        id: a.id,
+        fileName: a.fileName,
+        fileKey: a.fileKey,
+        fileUrl: a.fileUrl,
+        mimeType: a.mimeType,
+        fileSize: a.fileSize,
+        userId: a.userId,
+        createdAt: a.createdAt.toISOString(),
+      })),
+      children: (issue.children || []).map((c) => ({
         id: c.id,
         projectId: c.projectId,
         parentId: c.parentId,

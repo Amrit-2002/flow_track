@@ -216,3 +216,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Optimistic State Updates & Rollback**: Uses TanStack Query `useMutation` with `onMutate` to immediately render the card in the destination column. If the backend state machine rejects the transition with HTTP 422, the query cache cleanly rolls back to the previous snapshot and displays a non-intrusive alert banner.
   - **Accessible Quick-Transition Actions**: In addition to drag-and-drop, cards present permitted next-step buttons (e.g. "Move to In Progress →") queried from the workflow transition matrix.
 - **Verification**: 2 Vitest component tests in `KanbanBoardPage.test.tsx` verifying column rendering, card information, and quick transition click handlers. 16 web tests and 72 backend tests passing (88 total monorepo tests). Vite production build succeeded in 17.45s. Monorepo typechecks pass cleanly.
+
+---
+
+## Milestone 6.4: Comprehensive Issue Detail View with Comments & Attachments
+- **Status**: Completed
+- **Summary**: Delivered end-to-end Issue Detail page at `/issues/:id` combining state machine transition controls, hierarchical child subtasks, rich discussion comments, and multipart attachment management.
+- **Key Implementation Decisions**:
+  - **Two-Column Ergonomic Layout**: `IssueDetailPage.tsx` displays main story content (title, description, child subtask tree, discussion thread) in the primary left pane and operational metadata (permitted workflow status transitions, priority, assignee, reporter, file attachments widget) in the right pane.
+  - **Direct Status Machine Operations**: Displays permitted workflow transitions computed from backend rules, allowing instant status updates with immediate feedback and rollback protection.
+  - **Discussion Thread with File Attachments**: Supports creating, editing, and deleting comments with author identity avatars, formatted timestamps, and inline file attachment download links.
+  - **Subtask Hierarchy Navigation**: Displays child subtasks with direct links to their detail views, along with "+ Add Subtask" modal workflow pre-populating parent and project relationships.
+- **Verification**: 2 Vitest component tests in `IssueDetailPage.test.tsx` verifying rendering of issue details, priority, comments, and comment submission. 18 web tests and 72 backend tests passing (90 total monorepo tests). Vite production build succeeded in 15.25s. Monorepo typechecks pass cleanly.
