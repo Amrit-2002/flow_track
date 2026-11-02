@@ -30,3 +30,4 @@ export const savedFilterService = {
     await api.delete(`/saved-filters/${id}`);
   },
 };
+

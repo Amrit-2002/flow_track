@@ -55,3 +55,4 @@ export class SavedFilterController {
 }
 
 export const savedFilterController = new SavedFilterController();
+

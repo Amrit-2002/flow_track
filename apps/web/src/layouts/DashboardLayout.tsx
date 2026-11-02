@@ -16,6 +16,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../hooks/useRedux';
+import { useSocketInit } from '../hooks/useSocket';
 import { toggleTheme } from '../store/themeSlice';
 import { logout } from '../store/authSlice';
 import { cn } from '../utils/cn';
@@ -36,6 +37,7 @@ const navItems: NavItem[] = [
 ];
 
 export const DashboardLayout: React.FC = () => {
+  useSocketInit();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();

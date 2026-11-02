@@ -146,3 +146,4 @@ describe('LogTimeModal Component', () => {
     expect(mockOnClose).toHaveBeenCalled();
   });
 });
+

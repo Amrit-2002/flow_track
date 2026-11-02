@@ -63,3 +63,4 @@ describe('ActivityTimeline Component', () => {
     expect(screen.getByText(/created this issue/i)).toBeInTheDocument();
   });
 });
+

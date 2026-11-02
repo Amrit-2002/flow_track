@@ -265,3 +265,15 @@ This document records the incremental implementation walkthrough for every compl
   - **Saved Filters Bar Component**: Created `SavedFiltersBar.tsx` featuring preset chips with active state highlighting, inline "+ Save View" name prompt, and direct deletion controls with automatic TanStack Query cache invalidation.
   - **Backlog Page Integration**: Integrated `SavedFiltersBar` seamlessly into the top of the filter panel on `IssuesPage.tsx`, allowing team members to switch between custom filtered views (e.g., "Critical Bugs", "Backend Tasks") instantly.
 - **Verification**: 8 Vitest integration tests in `saved-filter.test.ts` covering authentication (401), validation (400), not-found (404), non-owner forbidden access (403), and admin deletion powers. 4 frontend tests in `SavedFiltersBar.test.tsx` and updated `IssuesPage.test.tsx`. 99 backend tests and 31 frontend tests passing (130 monorepo tests total). Monorepo typechecks and Vite build succeed cleanly.
+
+---
+
+## Milestone 8.1: Authenticated Real-Time Socket Infrastructure
+- **Status**: Completed
+- **Summary**: Implemented production Socket.IO server and client infrastructure supporting authenticated WebSocket handshakes, user-specific rooms, and guarded project collaboration rooms.
+- **Key Implementation Decisions**:
+  - **Handshake JWT Authentication Middleware**: Implemented `io.use()` middleware validating JWT access tokens passed via `socket.handshake.auth.token` or headers, securing the WebSocket layer against unauthorized connections.
+  - **Guarded Project Room Subscriptions**: Restricts `join:project` events to verified project team members and workspace Admins/Managers, avoiding unauthorized cross-tenant data leaks.
+  - **Broadcast Utilities**: Created modular dispatch helpers (`emitToProject`, `emitToUser`, `emitToAll`) to broadcast domain events cleanly across services without tight coupling.
+  - **Frontend Socket Lifecycle**: Implemented singleton `socketService` and React hooks (`useSocketInit`, `useProjectSocket`, `useSocketEvent`), automatically connecting with Redux auth credentials and disconnecting cleanly on logout.
+- **Verification**: 6 Vitest integration tests in `socket.test.ts` verifying unauthenticated connection rejection, invalid token rejection, auto-joining user rooms, project room broadcasts, and access-control enforcement. 5 Vitest unit tests in `socket.service.test.ts` verifying client connection, room events, and teardown. 105 backend tests and 36 frontend tests passing (141 monorepo tests total). Monorepo typechecks and Vite build succeed cleanly.

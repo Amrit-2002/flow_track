@@ -16,3 +16,4 @@ router.delete('/:id', (req, res, next) => savedFilterController.delete(req, res,
 
 export const savedFilterRouter = router;
 export default router;
+

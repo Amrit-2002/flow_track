@@ -30,3 +30,4 @@ export const timeLogService = {
     await api.delete(`/time-logs/${id}`);
   },
 };
+

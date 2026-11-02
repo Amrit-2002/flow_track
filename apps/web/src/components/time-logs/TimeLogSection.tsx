@@ -152,3 +152,4 @@ export const TimeLogSection: React.FC<TimeLogSectionProps> = ({
     </div>
   );
 };
+

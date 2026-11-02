@@ -183,3 +183,4 @@ export const SavedFiltersBar: React.FC<SavedFiltersBarProps> = ({
     </div>
   );
 };
+
