@@ -106,6 +106,11 @@ export interface TimeLogDTO {
   user: UserDTO;
 }
 
+export interface TimeLogsResponseDTO {
+  timeLogs: TimeLogDTO[];
+  totalMinutes: number;
+}
+
 export interface ActivityDTO {
   id: string;
   issueId: string;

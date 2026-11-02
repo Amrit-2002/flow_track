@@ -228,3 +228,16 @@ This document records the incremental implementation walkthrough for every compl
   - **Discussion Thread with File Attachments**: Supports creating, editing, and deleting comments with author identity avatars, formatted timestamps, and inline file attachment download links.
   - **Subtask Hierarchy Navigation**: Displays child subtasks with direct links to their detail views, along with "+ Add Subtask" modal workflow pre-populating parent and project relationships.
 - **Verification**: 2 Vitest component tests in `IssueDetailPage.test.tsx` verifying rendering of issue details, priority, comments, and comment submission. 18 web tests and 72 backend tests passing (90 total monorepo tests). Vite production build succeeded in 15.25s. Monorepo typechecks pass cleanly.
+
+---
+
+## Milestone 7.1: Work Time Logging & Aggregation API + UI
+- **Status**: Completed
+- **Summary**: Delivered end-to-end Work Time Logging, duration summation, activity audit trail generation, and modal logging workflow for issues.
+- **Key Implementation Decisions**:
+  - **Dedicated Time Log Domain Module**: Created `modules/time-logs/` with `TimeLogService`, `TimeLogController`, and `timeLogRouter` providing `GET /api/v1/issues/:issueId/time-logs`, `POST /api/v1/issues/:issueId/time-logs`, and `DELETE /api/v1/time-logs/:id`.
+  - **Prisma Schema & Transaction Audits**: Persists work logs against `time_logs` table linked to `issues` and `users`. Atomically creates `Activity` records on work log creation (`TIME_LOGGED`) and deletion (`TIME_LOG_DELETED`).
+  - **Calculated Total Duration Aggregation**: Calculates sum of all spent minutes on the backend, returning formatted time log records and aggregate duration for easy frontend rendering.
+  - **Interactive Modal & Calculation UI**: Built `LogTimeModal.tsx` supporting hours/minutes inputs with live minute calculations, work date picker, and optional work description.
+  - **Sidebar Time Tracking Widget**: Built `TimeLogSection.tsx` in `IssueDetailPage.tsx` displaying total time badges (e.g. `2h 45m`), item counts, individual work entries, and deletion controls with author/admin permission checks.
+- **Verification**: 11 Vitest integration tests in `time-log.test.ts` verifying authentication (401), non-member forbidden access (403), not-found checks (404), validation rules, transactional activity logging, and author/admin delete guards. 5 Vitest component tests in `LogTimeModal.test.tsx` and updated `IssueDetailPage.test.tsx`. 83 backend tests and 23 frontend tests passing (106 monorepo tests total). Monorepo typechecks and Vite build succeed cleanly.

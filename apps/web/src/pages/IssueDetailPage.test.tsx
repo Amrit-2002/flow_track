@@ -8,6 +8,7 @@ import { IssueDetailPage } from './IssueDetailPage';
 import { issueService } from '../services/issue.service';
 import { commentService } from '../services/comment.service';
 import { workflowService } from '../services/workflow.service';
+import { timeLogService } from '../services/time-log.service';
 import { IssuePriority, IssueType } from '@flowtrack/shared';
 
 describe('IssueDetailPage Component', () => {
@@ -103,6 +104,28 @@ describe('IssueDetailPage Component', () => {
     vi.spyOn(commentService, 'getComments').mockResolvedValue(mockComments as any);
     vi.spyOn(workflowService, 'getStatuses').mockResolvedValue(mockStatuses);
     vi.spyOn(workflowService, 'getTransitions').mockResolvedValue(mockTransitions);
+    vi.spyOn(timeLogService, 'getTimeLogs').mockResolvedValue({
+      timeLogs: [
+        {
+          id: 'tl-1',
+          issueId: 'issue-1',
+          userId: 'user-1',
+          timeSpent: 120,
+          description: 'Initial unit test coverage',
+          logDate: '2026-11-01',
+          createdAt: new Date().toISOString(),
+          user: {
+            id: 'user-1',
+            name: 'Bob Dev',
+            email: 'bob@flowtrack.dev',
+            role: 'USER' as any,
+            themePreference: 'dark' as any,
+            createdAt: new Date().toISOString(),
+          },
+        },
+      ],
+      totalMinutes: 120,
+    });
   });
 
   it('renders issue title, description, priority, and existing comments', async () => {
@@ -138,6 +161,11 @@ describe('IssueDetailPage Component', () => {
 
     // Verify permitted transition button
     expect(screen.getByRole('button', { name: /In Progress/i })).toBeInTheDocument();
+
+    // Verify time tracking
+    expect(screen.getByText('Time Tracking')).toBeInTheDocument();
+    expect(screen.getAllByText('2h').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Log Work')).toBeInTheDocument();
   });
 
   it('submits a new comment and calls commentService.createComment', async () => {

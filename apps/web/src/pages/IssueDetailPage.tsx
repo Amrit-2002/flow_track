@@ -26,8 +26,11 @@ import { issueService } from '../services/issue.service';
 import { commentService } from '../services/comment.service';
 import { attachmentService } from '../services/attachment.service';
 import { workflowService } from '../services/workflow.service';
+import { timeLogService } from '../services/time-log.service';
 import { EditIssueModal } from '../components/issues/EditIssueModal';
 import { CreateIssueModal } from '../components/issues/CreateIssueModal';
+import { LogTimeModal } from '../components/time-logs/LogTimeModal';
+import { TimeLogSection } from '../components/time-logs/TimeLogSection';
 import { useAppSelector } from '../hooks/useRedux';
 import {
   CommentDTO,
@@ -54,6 +57,7 @@ export const IssueDetailPage: React.FC = () => {
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isAddSubtaskOpen, setIsAddSubtaskOpen] = useState(false);
+  const [isLogTimeOpen, setIsLogTimeOpen] = useState(false);
   const [transitionError, setTransitionError] = useState<string | null>(null);
 
   // Comment input state
@@ -91,6 +95,13 @@ export const IssueDetailPage: React.FC = () => {
   const { data: transitions = [] } = useQuery<WorkflowTransitionDTO[]>({
     queryKey: ['workflow-transitions'],
     queryFn: () => workflowService.getTransitions(),
+  });
+
+  // 5. Fetch time logs for this issue
+  const { data: timeLogsData, isLoading: isTimeLogsLoading } = useQuery({
+    queryKey: ['issue-time-logs', id],
+    queryFn: () => timeLogService.getTimeLogs(id!),
+    enabled: Boolean(id),
   });
 
   // Status transition mutation
@@ -757,6 +768,16 @@ export const IssueDetailPage: React.FC = () => {
               </p>
             )}
           </div>
+
+          {/* Time Tracking Card */}
+          <TimeLogSection
+            issueId={id!}
+            timeLogs={timeLogsData?.timeLogs || []}
+            totalMinutes={timeLogsData?.totalMinutes || 0}
+            isLoading={isTimeLogsLoading}
+            currentUser={currentUser}
+            onOpenLogModal={() => setIsLogTimeOpen(true)}
+          />
         </div>
       </div>
 
@@ -784,6 +805,16 @@ export const IssueDetailPage: React.FC = () => {
           }}
           defaultProjectId={issue.projectId}
           defaultParentId={issue.id}
+        />
+      )}
+
+      {/* Log Time Modal */}
+      {issue && (
+        <LogTimeModal
+          isOpen={isLogTimeOpen}
+          onClose={() => setIsLogTimeOpen(false)}
+          issueId={id!}
+          issueTitle={issue.title}
         />
       )}
     </div>
