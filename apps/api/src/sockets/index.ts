@@ -9,9 +9,22 @@ import { UserRole } from '@flowtrack/shared';
 let io: SocketIOServer | null = null;
 
 export function initSocketServer(httpServer: HttpServer): SocketIOServer {
+  const allowedOrigins = env.CORS_ORIGIN.split(',').map((o) => o.trim().replace(/\/$/, ''));
+
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: env.CORS_ORIGIN,
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const normalized = origin.replace(/\/$/, '');
+        if (
+          allowedOrigins.includes('*') ||
+          allowedOrigins.includes(normalized) ||
+          (allowedOrigins.some((o) => o.includes('vercel.app')) && normalized.endsWith('.vercel.app'))
+        ) {
+          return callback(null, true);
+        }
+        return callback(new Error(`Origin ${origin} not allowed by CORS`), false);
+      },
       credentials: true,
       methods: ['GET', 'POST'],
     },

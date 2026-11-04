@@ -5,7 +5,7 @@ services:
     plan: free
     region: oregon
     buildCommand: npm ci && npm run build:shared && npm run db:generate && npm run build:api
-    startCommand: node apps/api/dist/server.js
+    startCommand: npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma && node apps/api/dist/server.js
     healthCheckPath: /health
     autoDeploy: true
     envVars:
@@ -13,15 +13,19 @@ services:
         value: production
       - key: PORT
         value: 5000
-      - key: CORS_ORIGIN
-        sync: false
       - key: DATABASE_URL
         sync: false
-      - key: JWT_ACCESS_SECRET
+      - key: DIRECT_URL
+        sync: false
+      - key: JWT_SECRET
         generateValue: true
-      - key: JWT_REFRESH_SECRET
-        generateValue: true
-      - key: ACCESS_TOKEN_EXPIRES_IN
+      - key: JWT_EXPIRES_IN
         value: 15m
       - key: REFRESH_TOKEN_EXPIRES_IN
         value: 7d
+      - key: CORS_ORIGIN
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: STORAGE_PROVIDER
+        value: local
