@@ -3,6 +3,7 @@ import { app } from './app';
 import { env } from './config/env';
 import { logger } from './shared/logger';
 import { prisma } from './shared/prisma';
+import { autoSeedDatabase } from './shared/autoSeed';
 import { initSocketServer } from './sockets';
 
 const server = http.createServer(app);
@@ -11,9 +12,12 @@ const server = http.createServer(app);
 initSocketServer(server);
 
 // Listen on 0.0.0.0 for Render / container compatibility
-server.listen(env.PORT, '0.0.0.0', () => {
+server.listen(env.PORT, '0.0.0.0', async () => {
   logger.info(`🚀 FlowTrack API server running at http://0.0.0.0:${env.PORT}`);
   logger.info(`🌍 Environment: ${env.NODE_ENV}`);
+
+  // Automatically seed demo data if database is brand new and empty
+  await autoSeedDatabase();
 });
 
 // Graceful shutdown handling
